@@ -1,0 +1,21 @@
+import type { ReactNode } from 'react'
+import { logout } from '@/app/actions/auth'
+import { AppNav } from '@/components/app-nav'
+import { requireUser } from '@/lib/auth'
+
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  const user = await requireUser()
+
+  return (
+    <div className="min-h-screen md:flex">
+      <aside className="flex flex-col border-b p-4 md:min-h-screen md:border-b-0 md:border-r">
+        <p className="truncate text-sm text-zinc-600">{user.email}</p>
+        <AppNav />
+        <form action={logout} className="mt-4 md:mt-auto">
+          <button className="text-sm underline" type="submit">Sign out</button>
+        </form>
+      </aside>
+      <main className="flex-1 p-6">{children}</main>
+    </div>
+  )
+}
