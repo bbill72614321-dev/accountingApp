@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import type { Language } from '@/features/transactions/categories'
+import { createServerClient } from '@/lib/supabase/server'
 
 export type Dictionary = {
   login: string; email: string; password: string; forgotPassword: string
@@ -11,6 +12,8 @@ export type Dictionary = {
   noTransactions: string; noCategorySpending: string; noSpendingCategory: string
   syncLater: string; included: string; excluded: string; edit: string; delete: string
   merchantRules: string; noMerchantRules: string
+  traditionalChinese: string; english: string
+  invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
   invalidLogin: string; resetSent: string; updateFailed: string
   recoveryExpired: string; passwordUpdated: string
 }
@@ -27,6 +30,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     noSpendingCategory: 'Income / no spending category', syncLater: 'Bank sync is added in Phase 2.',
     included: 'Included', excluded: 'Excluded', edit: 'Edit', delete: 'Delete',
     merchantRules: 'Merchant rules', noMerchantRules: 'No merchant rules yet.', invalidLogin: 'Unable to sign in.',
+    traditionalChinese: 'Traditional Chinese', english: 'English',
+    invalidTransaction: 'Check the transaction fields and try again.',
+    saveTransactionFailed: 'Unable to save the transaction.', updateTransactionFailed: 'Unable to update the transaction.',
     resetSent: 'If the account exists, a reset link has been sent.', updateFailed: 'Unable to update password.',
     recoveryExpired: 'Recovery session expired.', passwordUpdated: 'Password updated.',
   },
@@ -41,6 +47,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     noSpendingCategory: '收入／不列支出分類', syncLater: '銀行同步會在第二階段加入。',
     included: '列入結算', excluded: '不列入結算', edit: '編輯', delete: '刪除',
     merchantRules: '商家分類規則', noMerchantRules: '目前沒有商家分類規則。', invalidLogin: '無法登入。',
+    traditionalChinese: '繁體中文', english: '英文',
+    invalidTransaction: '請檢查交易欄位後再試。',
+    saveTransactionFailed: '無法儲存交易紀錄。', updateTransactionFailed: '無法更新交易紀錄。',
     resetSent: '如果帳戶存在，重設連結已寄出。', updateFailed: '無法更新密碼。',
     recoveryExpired: '密碼重設工作階段已過期。', passwordUpdated: '密碼已更新。',
   },
@@ -51,5 +60,19 @@ export function getDictionary(language: Language): Dictionary {
 }
 
 export async function getLanguage(): Promise<Language> {
-  return (await cookies()).get('app-language')?.value === 'en' ? 'en' : 'zh-TW'
+  const cookieLanguage = (await cookies()).get('app-language')?.value === 'en' ? 'en' : 'zh-TW'
+
+  try {
+    const supabase = await createServerClient()
+    const { data: authData } = await supabase.auth.getUser()
+    if (!authData.user) return cookieLanguage
+
+    const { data: profile, error } = await supabase.from('profiles').select('language')
+      .eq('user_id', authData.user.id).maybeSingle()
+    if (!error && (profile?.language === 'en' || profile?.language === 'zh-TW')) return profile.language
+  } catch {
+    // Keep unauthenticated pages and temporarily unavailable profiles usable.
+  }
+
+  return cookieLanguage
 }

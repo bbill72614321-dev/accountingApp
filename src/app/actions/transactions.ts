@@ -46,7 +46,7 @@ export async function createManualTransaction(
 ): Promise<ActionState> {
   const user = await requireUser()
   const parsed = manualTransactionSchema.safeParse(manualFields(formData))
-  if (!parsed.success) return { status: 'error', message: 'Check the transaction fields and try again.' }
+  if (!parsed.success) return { status: 'error', message: 'invalidTransaction' }
 
   const supabase = await createServerClient()
   const { merchant, category, date, amount, note } = parsed.data
@@ -60,7 +60,7 @@ export async function createManualTransaction(
     amount_cents: amount,
     note,
   })
-  if (error) return { status: 'error', message: 'Unable to save the transaction.' }
+  if (error) return { status: 'error', message: 'saveTransactionFailed' }
   revalidateLedger()
   redirect('/transactions')
 }
@@ -71,7 +71,7 @@ export async function updateManualTransaction(
   const user = await requireUser()
   const id = transactionIdSchema.safeParse(formData.get('transaction_id'))
   const parsed = manualTransactionSchema.safeParse(manualFields(formData))
-  if (!id.success || !parsed.success) return { status: 'error', message: 'Check the transaction fields and try again.' }
+  if (!id.success || !parsed.success) return { status: 'error', message: 'invalidTransaction' }
 
   const supabase = await createServerClient()
   const { merchant, category, date, amount, note } = parsed.data
@@ -83,7 +83,7 @@ export async function updateManualTransaction(
     amount_cents: amount,
     note,
   }).eq('id', id.data).eq('user_id', user.id).eq('source', 'manual').select('id').maybeSingle()
-  if (error || !data) return { status: 'error', message: 'Unable to update the transaction.' }
+  if (error || !data) return { status: 'error', message: 'updateTransactionFailed' }
   revalidateLedger()
   redirect('/transactions')
 }
