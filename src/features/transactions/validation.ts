@@ -22,7 +22,17 @@ export const manualTransactionSchema = z.object({
   merchant: z.string().trim().max(200),
   category: z.preprocess((value) => value === '' ? null : value, z.enum(CATEGORIES).nullable()),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  amount: z.string().transform(parseUsdToCents),
+  amount: z.string().transform((value, context) => {
+    try {
+      return parseUsdToCents(value)
+    } catch (error) {
+      context.addIssue({
+        code: 'custom',
+        message: error instanceof Error ? error.message : 'Enter a valid USD amount',
+      })
+      return z.NEVER
+    }
+  }),
   note: z.string().trim().max(1000),
 }).superRefine(({ amount, category }, context) => {
   if (amount < 0 && category === null) {

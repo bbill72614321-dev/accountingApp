@@ -17,6 +17,13 @@ describe('form validation', () => {
     })).toThrow()
   })
 
+  it('reports a malformed amount through safeParse', () => {
+    const result = manualTransactionSchema.safeParse({
+      merchant: 'Store', category: 'Grocery', date: '2026-08-01', amount: '12.345', note: '',
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('validates both password-reset boundaries', () => {
     expect(passwordResetRequestSchema.parse({ email: ' ONE@example.com ' })).toEqual({ email: 'one@example.com' })
     expect(() => updatePasswordSchema.parse({ password: 'short', confirmation: 'short' })).toThrow()

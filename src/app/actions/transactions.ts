@@ -102,25 +102,18 @@ export async function deleteTransaction(formData: FormData): Promise<void> {
 }
 
 export async function updateTransactionCategory(formData: FormData): Promise<void> {
-  const user = await requireUser()
+  await requireUser()
   const parsed = transactionCategorySchema.safeParse({
     transactionId: formData.get('transaction_id'), category: formData.get('category'),
   })
   if (!parsed.success) throw new Error('Invalid transaction category')
 
   const supabase = await createServerClient()
-  const { data, error } = await supabase.from('transactions').update({ category_override: parsed.data.category })
-    .eq('id', parsed.data.transactionId).eq('user_id', user.id).select('normalized_merchant').maybeSingle()
-  if (error || !data) throw new Error('Unable to update transaction category')
-
-  if (data.normalized_merchant) {
-    const { error: ruleError } = await supabase.from('merchant_rules').upsert({
-      user_id: user.id,
-      normalized_merchant: data.normalized_merchant,
-      category: parsed.data.category,
-    }, { onConflict: 'user_id,normalized_merchant' })
-    if (ruleError) throw new Error('Unable to save merchant rule')
-  }
+  const { error } = await supabase.rpc('set_transaction_category_and_rule', {
+    p_transaction_id: parsed.data.transactionId,
+    p_category: parsed.data.category,
+  })
+  if (error) throw new Error('Unable to update transaction category')
   revalidateLedger()
 }
 
