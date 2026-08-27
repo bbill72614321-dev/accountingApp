@@ -1,0 +1,39 @@
+import { notFound } from 'next/navigation'
+import { z } from 'zod'
+import { deleteTransaction, updateManualTransaction } from '@/app/actions/transactions'
+import { ManualTransactionForm } from '@/components/manual-transaction-form'
+import { requireUser } from '@/lib/auth'
+import { createServerClient } from '@/lib/supabase/server'
+
+const idSchema = z.string().uuid()
+
+export default async function EditTransactionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: rawId } = await params
+  const id = idSchema.safeParse(rawId)
+  if (!id.success) notFound()
+
+  const user = await requireUser()
+  const supabase = await createServerClient()
+  const { data, error } = await supabase.from('transactions').select(
+    'id, raw_description, source_category, transaction_date, amount_cents, note',
+  ).eq('id', id.data).eq('user_id', user.id).eq('source', 'manual').maybeSingle()
+  if (error || !data) notFound()
+
+  return (
+    <>
+      <h1 className="mb-4 text-2xl font-semibold">Edit transaction</h1>
+      <ManualTransactionForm action={updateManualTransaction} values={{
+        id: data.id,
+        merchant: data.raw_description ?? '',
+        category: data.source_category,
+        date: data.transaction_date,
+        amount: String(data.amount_cents / 100),
+        note: data.note,
+      }} />
+      <form action={deleteTransaction} className="mt-6">
+        <input name="transaction_id" type="hidden" value={data.id} />
+        <button type="submit">Delete transaction</button>
+      </form>
+    </>
+  )
+}
