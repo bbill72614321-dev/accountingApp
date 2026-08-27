@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Accounting Application
 
-## Getting Started
+A bilingual personal accounting app with an owner-scoped manual transaction ledger.
 
-First, run the development server:
+## Requirements
+
+- Node.js 22 (see `.nvmrc`)
+- npm
+- A Docker-compatible runtime for local Supabase
+- The Supabase CLI supplied through this repository's local development dependency
+
+## Local setup
+
+Install dependencies and start local Supabase:
+
+```bash
+npm install
+npx supabase start
+```
+
+Create the local environment file, then copy the API URL and anon key reported by `npx supabase status` into it:
+
+```bash
+cp .env.example .env.local
+npx supabase status
+```
+
+Open local Supabase Studio at `http://127.0.0.1:54323`, then use **Authentication → Users** to create exactly two development users. Keep their email addresses and passwords outside the repository. Before E2E, set `E2E_USER_ONE_EMAIL`, `E2E_USER_ONE_PASSWORD`, `E2E_USER_TWO_EMAIL`, and `E2E_USER_TWO_PASSWORD` in your shell; do not add their values to `.env.local` or any committed file.
+
+Install Chromium once for the browser test:
+
+```bash
+npx playwright install chromium
+```
+
+## Commands
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm test
+npm run test:db
+npm run test:e2e
+npm run check
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The E2E test creates a transaction as the first user, confirms the second user cannot find it or open its captured edit URL, and then changes the second user's language to confirm the visible identity is retained.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production note
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Production must use two invited users and public sign-ups must be disabled. Never expose development or production credentials in `.env.local` commits, tests, or documentation.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See the [approved design](docs/superpowers/specs/2026-08-26-personal-finance-web-app-design.md) and [implementation roadmap](docs/superpowers/plans/README.md).
