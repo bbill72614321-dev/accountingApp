@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { z } from 'zod'
 import { TransactionTable, type TransactionRow } from '@/components/transaction-table'
-import { CATEGORIES } from '@/features/transactions/categories'
+import { CATEGORIES, CATEGORY_LABELS } from '@/features/transactions/categories'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
+import { getDictionary, getLanguage } from '@/lib/i18n'
 
 const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
 const searchSchema = z.string().trim().min(1).max(200).regex(/^[\p{L}\p{N}\s.'’-]+$/u)
@@ -21,6 +22,8 @@ export default async function TransactionsPage({
   const category = z.enum(CATEGORIES).safeParse(rawCategory).data
   const search = searchSchema.safeParse(rawSearch).data
   const user = await requireUser()
+  const language = await getLanguage()
+  const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   let query = supabase.from('transactions').select(
     'id, raw_description, source_category, category_override, transaction_date, amount_cents, note, include_in_report',
@@ -37,22 +40,22 @@ export default async function TransactionsPage({
   return (
     <>
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Transactions</h1>
-        <Link href="/transactions/new">Add transaction</Link>
+        <h1 className="text-2xl font-semibold">{dictionary.transactions}</h1>
+        <Link href="/transactions/new">{dictionary.newTransaction}</Link>
       </div>
       <form className="mb-4 flex flex-wrap gap-2" method="get">
-        <label htmlFor="month">Month</label>
+        <label htmlFor="month">{dictionary.month}</label>
         <input defaultValue={month} id="month" name="month" pattern="\d{4}-(0[1-9]|1[0-2])" placeholder="YYYY-MM" />
-        <label htmlFor="filter-category">Category</label>
+        <label htmlFor="filter-category">{dictionary.category}</label>
         <select defaultValue={category ?? ''} id="filter-category" name="category">
-          <option value="">All categories</option>
-          {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+          <option value="">—</option>
+          {CATEGORIES.map((item) => <option key={item} value={item}>{CATEGORY_LABELS[item][language]}</option>)}
         </select>
-        <label htmlFor="q">Search</label>
+        <label htmlFor="q">{dictionary.search}</label>
         <input defaultValue={search} id="q" name="q" />
-        <button type="submit">Filter</button>
+        <button type="submit">{dictionary.filters}</button>
       </form>
-      {rows.length === 0 ? <p>No transactions found.</p> : <TransactionTable rows={rows} />}
+      {rows.length === 0 ? <p>{dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={rows} />}
     </>
   )
 }

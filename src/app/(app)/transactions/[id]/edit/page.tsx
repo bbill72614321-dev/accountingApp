@@ -4,6 +4,7 @@ import { deleteTransaction, updateManualTransaction } from '@/app/actions/transa
 import { ManualTransactionForm } from '@/components/manual-transaction-form'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
+import { getDictionary, getLanguage } from '@/lib/i18n'
 
 const idSchema = z.string().uuid()
 
@@ -13,6 +14,8 @@ export default async function EditTransactionPage({ params }: { params: Promise<
   if (!id.success) notFound()
 
   const user = await requireUser()
+  const language = await getLanguage()
+  const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
     'id, raw_description, source_category, transaction_date, amount_cents, note',
@@ -21,8 +24,8 @@ export default async function EditTransactionPage({ params }: { params: Promise<
 
   return (
     <>
-      <h1 className="mb-4 text-2xl font-semibold">Edit transaction</h1>
-      <ManualTransactionForm action={updateManualTransaction} values={{
+      <h1 className="mb-4 text-2xl font-semibold">{dictionary.edit}</h1>
+      <ManualTransactionForm action={updateManualTransaction} language={language} labels={dictionary} values={{
         id: data.id,
         merchant: data.raw_description ?? '',
         category: data.source_category,
@@ -32,7 +35,7 @@ export default async function EditTransactionPage({ params }: { params: Promise<
       }} />
       <form action={deleteTransaction} className="mt-6">
         <input name="transaction_id" type="hidden" value={data.id} />
-        <button type="submit">Delete transaction</button>
+        <button type="submit">{dictionary.delete}</button>
       </form>
     </>
   )

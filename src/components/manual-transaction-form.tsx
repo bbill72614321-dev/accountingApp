@@ -3,21 +3,9 @@
 import { useActionState } from 'react'
 import type { ActionState } from '@/app/actions/transactions'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
+import type { Dictionary } from '@/lib/i18n'
 
-type Labels = {
-  merchant: string
-  category: string
-  noSpendingCategory: string
-  date: string
-  amount: string
-  note: string
-  save: string
-}
-
-const englishLabels: Labels = {
-  merchant: 'Merchant', category: 'Category', noSpendingCategory: 'No spending category',
-  date: 'Date', amount: 'Amount', note: 'Note', save: 'Save transaction',
-}
+type Labels = Pick<Dictionary, 'merchant' | 'category' | 'noSpendingCategory' | 'date' | 'amount' | 'note' | 'save'>
 
 const initialState: ActionState = { status: 'idle', message: '' }
 
@@ -36,9 +24,9 @@ export function ManualTransactionForm({
   action: (state: ActionState, formData: FormData) => Promise<ActionState>
   values?: FormValues
   language?: Language
-  labels?: Partial<Labels>
+  labels: Labels
 }) {
-  const dictionary = { ...englishLabels, ...labels }
+  const dictionary = labels
   const [state, formAction, pending] = useActionState(action, initialState)
 
   return (

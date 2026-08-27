@@ -7,6 +7,7 @@ import {
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
+import type { Dictionary } from '@/lib/i18n'
 
 export type TransactionRow = {
   id: string
@@ -19,12 +20,12 @@ export type TransactionRow = {
   include_in_report: boolean
 }
 
-export function TransactionTable({ rows, language = 'en' }: { rows: TransactionRow[]; language?: Language }) {
+export function TransactionTable({ rows, language = 'en', dictionary }: { rows: TransactionRow[]; language?: Language; dictionary: Dictionary }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left">
         <thead>
-          <tr><th>Merchant</th><th>Category</th><th>Date</th><th>Amount</th><th>Note</th></tr>
+          <tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th></tr>
         </thead>
         <tbody>
           {rows.map((row) => {
@@ -38,12 +39,12 @@ export function TransactionTable({ rows, language = 'en' }: { rows: TransactionR
                 <td>
                   <form action={updateTransactionCategory}>
                     <input name="transaction_id" type="hidden" value={row.id} />
-                    <label className="sr-only" htmlFor={`category-${row.id}`}>Category for {row.raw_description || 'transaction'}</label>
+                    <label className="sr-only" htmlFor={`category-${row.id}`}>{dictionary.category}</label>
                     <select defaultValue={category ?? ''} id={`category-${row.id}`} name="category">
-                      <option disabled value="">No spending category</option>
+                      <option disabled value="">{dictionary.noSpendingCategory}</option>
                       {CATEGORIES.map((item) => <option key={item} value={item}>{CATEGORY_LABELS[item][language]}</option>)}
                     </select>
-                    <button type="submit">Save category</button>
+                    <button type="submit">{dictionary.save}</button>
                   </form>
                 </td>
                 <td>{row.transaction_date}</td>
@@ -51,19 +52,19 @@ export function TransactionTable({ rows, language = 'en' }: { rows: TransactionR
                 <td>
                   <form action={updateTransactionNote}>
                     <input name="transaction_id" type="hidden" value={row.id} />
-                    <label className="sr-only" htmlFor={`note-${row.id}`}>Note for {row.raw_description || 'transaction'}</label>
+                    <label className="sr-only" htmlFor={`note-${row.id}`}>{dictionary.note}</label>
                     <input defaultValue={row.note} id={`note-${row.id}`} maxLength={1000} name="note" />
-                    <button type="submit">Save note</button>
+                    <button type="submit">{dictionary.save}</button>
                   </form>
                   <div className="mt-2 flex gap-2 text-sm">
-                    <span>{row.include_in_report ? 'Included in reports' : 'Excluded from reports'}</span>
+                    <span>{row.include_in_report ? dictionary.included : dictionary.excluded}</span>
                     <form action={setTransactionIncluded}>
                       <input name="transaction_id" type="hidden" value={row.id} />
                       <button name="included" type="submit" value={String(!row.include_in_report)}>
-                        {row.include_in_report ? 'Exclude from reports' : 'Include in reports'}
+                        {row.include_in_report ? dictionary.excluded : dictionary.included}
                       </button>
                     </form>
-                    <Link href={`/transactions/${row.id}/edit`}>Edit transaction</Link>
+                    <Link href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>
                   </div>
                 </td>
               </tr>
