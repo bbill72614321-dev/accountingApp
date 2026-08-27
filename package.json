@@ -22,7 +22,7 @@
     "zod": "^4.4.3"
   },
   "engines": {
-    "node": ">=20.9"
+    "node": ">=22"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",

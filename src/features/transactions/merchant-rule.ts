@@ -6,3 +6,7 @@ export function displayedCategory(input: {
 }): Category | null {
   return input.categoryOverride ?? input.sourceCategory
 }
+
+export function effectiveCategoryFilter(category: Category): string {
+  return `category_override.eq."${category}",and(category_override.is.null,source_category.eq."${category}")`
+}

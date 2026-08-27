@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { z } from 'zod'
 import { TransactionTable, type TransactionRow } from '@/components/transaction-table'
 import { CATEGORIES, CATEGORY_LABELS } from '@/features/transactions/categories'
+import { effectiveCategoryFilter } from '@/features/transactions/merchant-rule'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { getDictionary, getLanguage } from '@/lib/i18n'
@@ -30,7 +31,7 @@ export default async function TransactionsPage({
   ).eq('user_id', user.id).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
-  if (category) query = query.or(`source_category.eq."${category}",category_override.eq."${category}"`)
+  if (category) query = query.or(effectiveCategoryFilter(category))
   if (search) query = query.or(`raw_description.ilike.*${search}*,note.ilike.*${search}*`)
 
   const { data, error } = await query

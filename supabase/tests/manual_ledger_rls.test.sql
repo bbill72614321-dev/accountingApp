@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(12);
+select plan(31);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
 values
@@ -12,9 +12,32 @@ values
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'manual', 'ALPHA', '2026-08-01', -1000, 'Grocery'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'manual', 'BETA', '2026-08-02', -2000, 'Travel');
 
+insert into public.merchant_rules (id, user_id, normalized_merchant, category)
+values
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'ALPHA', 'Grocery'),
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'BETA', 'Travel');
+
 set local role authenticated;
 set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
 set local request.jwt.claim.role = 'authenticated';
+
+select results_eq('select count(*) from public.profiles', array[1::bigint], 'user one sees one profile');
+select results_eq(
+  $$select user_id from public.profiles$$,
+  array['11111111-1111-1111-1111-111111111111'::uuid], 'user one reads only their profile'
+);
+select is_empty(
+  $$update public.profiles set language = 'en' where user_id = '22222222-2222-2222-2222-222222222222' returning user_id$$,
+  'user one cannot update user two profile'
+);
+select is_empty(
+  $$delete from public.profiles where user_id = '22222222-2222-2222-2222-222222222222' returning user_id$$,
+  'user one cannot delete user two profile'
+);
+select throws_ok(
+  $$insert into public.profiles (user_id) values ('33333333-3333-3333-3333-333333333333')$$,
+  '42501', null, 'user one cannot forge another profile'
+);
 
 select results_eq('select count(*) from public.transactions', array[1::bigint], 'user one sees one row');
 select results_eq($$select normalized_merchant from public.transactions$$, array['ALPHA'::text], 'user one sees only own row');
@@ -23,6 +46,24 @@ select is_empty($$delete from public.transactions where user_id = '22222222-2222
 select throws_ok(
   $$insert into public.transactions (user_id, source, normalized_merchant, transaction_date, amount_cents) values ('22222222-2222-2222-2222-222222222222', 'manual', 'FORGED', '2026-08-03', -3000)$$,
   '42501', null, 'user one cannot insert for user two'
+);
+
+select results_eq('select count(*) from public.merchant_rules', array[1::bigint], 'user one sees one merchant rule');
+select results_eq(
+  $$select normalized_merchant from public.merchant_rules$$,
+  array['ALPHA'::text], 'user one reads only their merchant rule'
+);
+select is_empty(
+  $$update public.merchant_rules set category = 'Cat' where user_id = '22222222-2222-2222-2222-222222222222' returning id$$,
+  'user one cannot update user two merchant rule'
+);
+select is_empty(
+  $$delete from public.merchant_rules where user_id = '22222222-2222-2222-2222-222222222222' returning id$$,
+  'user one cannot delete user two merchant rule'
+);
+select throws_ok(
+  $$insert into public.merchant_rules (user_id, normalized_merchant, category) values ('22222222-2222-2222-2222-222222222222', 'GAMMA', 'Cat')$$,
+  '42501', null, 'user one cannot forge a rule for user two'
 );
 
 select lives_ok(
@@ -42,6 +83,27 @@ select throws_ok(
   'P0002', 'Transaction not found', 'user one cannot categorize user two transaction'
 );
 
+select lives_ok(
+  $$select public.update_manual_transaction_and_rule('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Alpha Market', 'ALPHA MARKET', 'Travel', '2026-08-03', -1500, 'updated')$$,
+  'user one can atomically edit their manual transaction'
+);
+select results_eq(
+  $$select raw_description || '|' || source_category::text || '|' || transaction_date::text || '|' || amount_cents::text || '|' || note from public.transactions where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'$$,
+  array['Alpha Market|Travel|2026-08-03|-1500|updated'::text], 'the full manual edit is saved'
+);
+select is(
+  (select category_override::text from public.transactions where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+  null::text, 'the full manual edit clears the stale category override'
+);
+select results_eq(
+  $$select category::text from public.merchant_rules where normalized_merchant = 'ALPHA MARKET'$$,
+  array['Travel'::text], 'the full manual edit learns the changed effective category'
+);
+select throws_ok(
+  $$select public.update_manual_transaction_and_rule('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Forged', 'FORGED', 'Cat', '2026-08-04', -3000, 'forged')$$,
+  'P0002', 'Manual transaction not found', 'user one cannot edit user two manual transaction'
+);
+
 reset role;
 select is(
   (select category_override::text from public.transactions where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
@@ -54,6 +116,30 @@ select ok(
 select ok(
   has_function_privilege('authenticated', 'public.set_transaction_category_and_rule(uuid, public.transaction_category)', 'execute'),
   'authenticated users can execute the category RPC'
+);
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.update_manual_transaction_and_rule(uuid, text, text, public.transaction_category, date, bigint, text)',
+    'execute'
+  ),
+  'anonymous users cannot execute the full-edit RPC'
+);
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.update_manual_transaction_and_rule(uuid, text, text, public.transaction_category, date, bigint, text)',
+    'execute'
+  ),
+  'authenticated users can execute the full-edit RPC'
+);
+select ok(
+  not has_function_privilege('anon', 'public.create_profile_for_user()', 'execute'),
+  'anonymous users cannot execute the security-definer profile trigger function'
+);
+select ok(
+  not has_function_privilege('authenticated', 'public.create_profile_for_user()', 'execute'),
+  'authenticated users cannot execute the security-definer profile trigger function'
 );
 
 select * from finish();

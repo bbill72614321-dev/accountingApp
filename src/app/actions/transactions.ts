@@ -68,22 +68,23 @@ export async function createManualTransaction(
 export async function updateManualTransaction(
   _state: ActionState, formData: FormData,
 ): Promise<ActionState> {
-  const user = await requireUser()
+  await requireUser()
   const id = transactionIdSchema.safeParse(formData.get('transaction_id'))
   const parsed = manualTransactionSchema.safeParse(manualFields(formData))
   if (!id.success || !parsed.success) return { status: 'error', message: 'invalidTransaction' }
 
   const supabase = await createServerClient()
   const { merchant, category, date, amount, note } = parsed.data
-  const { data, error } = await supabase.from('transactions').update({
-    raw_description: merchant,
-    normalized_merchant: normalizeMerchant(merchant),
-    source_category: category,
-    transaction_date: date,
-    amount_cents: amount,
-    note,
-  }).eq('id', id.data).eq('user_id', user.id).eq('source', 'manual').select('id').maybeSingle()
-  if (error || !data) return { status: 'error', message: 'updateTransactionFailed' }
+  const { error } = await supabase.rpc('update_manual_transaction_and_rule', {
+    p_transaction_id: id.data,
+    p_merchant: merchant,
+    p_normalized_merchant: normalizeMerchant(merchant),
+    p_category: category,
+    p_transaction_date: date,
+    p_amount_cents: amount,
+    p_note: note,
+  })
+  if (error) return { status: 'error', message: 'updateTransactionFailed' }
   revalidateLedger()
   redirect('/transactions')
 }

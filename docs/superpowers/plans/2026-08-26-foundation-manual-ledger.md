@@ -145,7 +145,7 @@ Create `.env.example`:
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=replace-with-local-anon-key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
 ```
 
 Ensure `.env.local`, `.env.*.local`, Playwright output, and Supabase temporary files are ignored:

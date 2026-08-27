@@ -1,5 +1,6 @@
+import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
-import { getPublicEnv } from './env'
+import { getPublicEnv, getServerEnv } from './env'
 
 const original = { ...process.env }
 
@@ -21,5 +22,15 @@ describe('getPublicEnv', () => {
       supabaseUrl: 'http://127.0.0.1:54321',
       supabaseAnonKey: 'anon-key',
     })
+  })
+
+  it('uses the local recovery origin from the environment template', () => {
+    const template = readFileSync(new URL('../../.env.example', import.meta.url), 'utf8')
+    for (const line of template.split('\n')) {
+      const separator = line.indexOf('=')
+      if (separator > 0) process.env[line.slice(0, separator)] = line.slice(separator + 1)
+    }
+
+    expect(getServerEnv().appUrl).toBe('http://127.0.0.1:3000')
   })
 })
