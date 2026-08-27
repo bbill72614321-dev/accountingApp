@@ -1,0 +1,32 @@
+import { CATEGORIES, type Category } from './categories'
+
+export type SummaryTransaction = {
+  date: string
+  amountCents: number
+  category: Category | null
+  pending: boolean
+  includeInReport: boolean
+}
+
+export type MonthlySummary = {
+  totalSpendingCents: number
+  netAmountCents: number
+  categorySpending: Record<Category, number>
+}
+
+export function summarizeMonth(
+  transactions: readonly SummaryTransaction[],
+  month: `${number}-${string}`,
+): MonthlySummary {
+  const categorySpending = Object.fromEntries(CATEGORIES.map((name) => [name, 0])) as Record<Category, number>
+  let netAmountCents = 0
+
+  for (const transaction of transactions) {
+    if (!transaction.date.startsWith(`${month}-`) || transaction.pending || !transaction.includeInReport) continue
+    netAmountCents += transaction.amountCents
+    if (transaction.category) categorySpending[transaction.category] -= transaction.amountCents
+  }
+
+  const totalSpendingCents = Math.max(0, Object.values(categorySpending).reduce((sum, value) => sum + value, 0))
+  return { totalSpendingCents, netAmountCents, categorySpending }
+}
