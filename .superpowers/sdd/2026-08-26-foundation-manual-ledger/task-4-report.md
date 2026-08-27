@@ -58,3 +58,21 @@ The local Supabase database runtime was unavailable, so no users were created th
 ## Concerns
 
 The app shell now links to `/dashboard`, `/transactions`, and `/settings`, but those pages are intentionally not part of Task 4 and will be supplied by later tasks. The Node 20/Vitest ESM incompatibility remains an environment concern; use Node 22.23.2 (or align the dependency/runtime versions) for test execution.
+
+## Fix round 1: auth callback redirect allowlist
+
+### Change
+
+Replaced the callback's permissive `startsWith('/')` destination check with an exact allowlist: `/reset-password`, `/dashboard`, `/transactions`, and `/settings`. These are the only internal post-auth destinations used by this task. Any other value falls back to `/reset-password` before URL resolution.
+
+### Regression test and TDD evidence
+
+- Added `src/app/auth/callback/route.test.ts`, which calls the real route handler without a code parameter and checks the returned redirect location.
+- RED command (Node 22.23.2): `npm test -- src/app/auth/callback/route.test.ts`
+  - Result: 1 of 2 tests failed as expected. An encoded backslash destination (`next=%2F%5Cevil.example`) redirected to `https://evil.example/` instead of `https://ledger.example/reset-password`.
+- GREEN command (Node 22.23.2): `npm test -- src/app/auth/callback/route.test.ts`
+  - Result: 1 file, 2 tests passed. The encoded-backslash external form falls back to `/reset-password`; `/dashboard` is retained.
+
+### Verification
+
+`npm run check` was run with Node 22.23.2 after the fix. It completed successfully: lint passed, all tests passed, and the production build completed.
