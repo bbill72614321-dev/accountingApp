@@ -18,7 +18,7 @@ export type Dictionary = {
   traditionalChinese: string; english: string
   invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
   invalidLogin: string; resetSent: string; updateFailed: string
-  recoveryExpired: string; passwordUpdated: string
+  recoveryExpired: string; passwordUpdated: string; privateLedgerDescription: string
   downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; transactionDetails: string
 }
 
@@ -42,6 +42,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     saveTransactionFailed: 'Unable to save the transaction.', updateTransactionFailed: 'Unable to update the transaction.',
     resetSent: 'If the account exists, a reset link has been sent.', updateFailed: 'Unable to update password.',
     recoveryExpired: 'Recovery session expired.', passwordUpdated: 'Password updated.',
+    privateLedgerDescription: 'Your monthly picture, kept personal.',
     downloadExcel: 'Download Excel', savePdf: 'Save as PDF', monthlySummary: 'Monthly summary',
     categorySummary: 'Category summary', transactionDetails: 'Transaction details',
   },
@@ -64,6 +65,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     saveTransactionFailed: '無法儲存交易紀錄。', updateTransactionFailed: '無法更新交易紀錄。',
     resetSent: '如果帳戶存在，重設連結已寄出。', updateFailed: '無法更新密碼。',
     recoveryExpired: '密碼重設工作階段已過期。', passwordUpdated: '密碼已更新。',
+    privateLedgerDescription: '你的每月帳務，只屬於你。',
     downloadExcel: '下載 Excel', savePdf: '另存為 PDF', monthlySummary: '每月結算',
     categorySummary: '分類結算', transactionDetails: '交易明細',
   },

@@ -8,7 +8,7 @@ export default async function LoginPage() {
       <section className="auth-panel">
         <span className="eyebrow">PRIVATE LEDGER</span>
         <h1>{dictionary.login}</h1>
-        <p className="muted">Your monthly picture, kept personal.</p>
+        <p className="muted">{dictionary.privateLedgerDescription}</p>
         <div className="auth-form">
           <LoginForm dictionary={dictionary} />
         </div>

@@ -30,6 +30,11 @@ describe('translations', () => {
     expect(dictionaries['zh-TW'].english).toBe('英文')
   })
 
+  it('translates the private ledger description', () => {
+    expect(dictionaries.en.privateLedgerDescription).toBe('Your monthly picture, kept personal.')
+    expect(dictionaries['zh-TW'].privateLedgerDescription).toBe('你的每月帳務，只屬於你。')
+  })
+
   describe('getLanguage', () => {
     beforeEach(() => {
       vi.clearAllMocks()
