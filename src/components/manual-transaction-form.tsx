@@ -32,7 +32,7 @@ export function ManualTransactionForm({
   const message = state.message in dictionary ? dictionary[state.message as keyof Labels] : state.message
 
   return (
-    <form action={formAction} className="grid max-w-md gap-3">
+    <form action={formAction} className="form-stack">
       {values.id && <input name="transaction_id" type="hidden" value={values.id} />}
       <label htmlFor="merchant">{dictionary.merchant}</label>
       <input defaultValue={values.merchant} id="merchant" maxLength={200} name="merchant" />
@@ -55,7 +55,7 @@ export function ManualTransactionForm({
       <label htmlFor="note">{dictionary.note}</label>
       <textarea defaultValue={values.note} id="note" maxLength={1000} name="note" />
       {state.status === 'error' && <p role="alert">{message}</p>}
-      <button disabled={pending} type="submit">{dictionary.save}</button>
+      <button className="primary-action" disabled={pending} type="submit">{dictionary.save}</button>
     </form>
   )
 }

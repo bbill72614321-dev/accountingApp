@@ -13,6 +13,11 @@ describe('UI state helpers', () => {
     expect(isCurrentNavigationPath('/dashboard', '/transactions')).toBe(false)
   })
 
+  it('keeps Transactions active on its add and edit routes', () => {
+    expect(isCurrentNavigationPath('/transactions/new', '/transactions')).toBe(true)
+    expect(isCurrentNavigationPath('/transactions/abc/edit', '/transactions')).toBe(true)
+  })
+
   it('allows deletion only for manual transactions', () => {
     expect(canDeleteTransaction('manual')).toBe(true)
     expect(canDeleteTransaction('plaid')).toBe(false)

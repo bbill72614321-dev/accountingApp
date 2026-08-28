@@ -4,11 +4,15 @@ import { getDictionary, getLanguage } from '@/lib/i18n'
 export default async function LoginPage() {
   const dictionary = getDictionary(await getLanguage())
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-10 p-6">
-      <section>
-        <h1 className="text-3xl font-semibold">{dictionary.login}</h1>
+    <main className="auth-page">
+      <section className="auth-panel">
+        <span className="eyebrow">PRIVATE LEDGER</span>
+        <h1>{dictionary.login}</h1>
+        <p className="muted">Your monthly picture, kept personal.</p>
+        <div className="auth-form">
+          <LoginForm dictionary={dictionary} />
+        </div>
       </section>
-      <LoginForm dictionary={dictionary} />
     </main>
   )
 }

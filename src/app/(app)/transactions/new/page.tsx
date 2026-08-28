@@ -6,9 +6,14 @@ export default async function NewTransactionPage() {
   const language = await getLanguage()
   const dictionary = getDictionary(language)
   return (
-    <>
-      <h1 className="mb-4 text-2xl font-semibold">{dictionary.newTransaction}</h1>
+    <section className="console-page entry-page">
+      <div className="page-heading">
+        <div>
+          <span className="eyebrow">LEDGER / NEW</span>
+          <h1>{dictionary.newTransaction}</h1>
+        </div>
+      </div>
       <ManualTransactionForm action={createManualTransaction} language={language} labels={dictionary} />
-    </>
+    </section>
   )
 }

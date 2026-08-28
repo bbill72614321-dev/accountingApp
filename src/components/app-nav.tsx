@@ -14,9 +14,9 @@ const links = [
 export function AppNav({ dictionary }: { dictionary: Dictionary }) {
   const pathname = usePathname()
   return (
-    <nav aria-label="Main navigation" className="flex w-full justify-around border-y py-2 md:w-48 md:flex-col md:justify-start md:gap-1 md:border-y-0 md:border-r md:py-0 md:pr-4">
+    <nav aria-label="Main navigation" className="app-nav">
       {links.map((link) => (
-        <Link aria-current={isCurrentNavigationPath(pathname, link.href) ? 'page' : undefined} className={`rounded px-3 py-2 text-sm hover:bg-zinc-100 ${isCurrentNavigationPath(pathname, link.href) ? 'bg-zinc-200 font-semibold text-zinc-950' : ''}`} href={link.href} key={link.href}>
+        <Link aria-current={isCurrentNavigationPath(pathname, link.href) ? 'page' : undefined} className={`app-nav-link ${isCurrentNavigationPath(pathname, link.href) ? 'is-active' : ''}`} href={link.href} key={link.href}>
           {dictionary[link.key]}
         </Link>
       ))}

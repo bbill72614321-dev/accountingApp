@@ -1,5 +1,5 @@
 export function isCurrentNavigationPath(pathname: string, href: string) {
-  return pathname === href
+  return pathname === href || pathname.startsWith(`${href}/`)
 }
 
 export function canDeleteTransaction(source: string) {
