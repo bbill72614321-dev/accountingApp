@@ -22,6 +22,7 @@ export const manualTransactionSchema = z.object({
   merchant: z.string().trim().max(200),
   category: z.preprocess((value) => value === '' ? null : value, z.enum(CATEGORIES).nullable()),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  type: z.enum(['expense', 'income']),
   amount: z.string().transform((value, context) => {
     try {
       return parseUsdToCents(value)
@@ -34,8 +35,14 @@ export const manualTransactionSchema = z.object({
     }
   }),
   note: z.string().trim().max(1000),
-}).superRefine(({ amount, category }, context) => {
-  if (amount < 0 && category === null) {
+}).superRefine(({ type, category }, context) => {
+  if (type === 'expense' && category === null) {
     context.addIssue({ code: 'custom', path: ['category'], message: 'Spending requires a category' })
   }
-})
+  if (type === 'income' && category !== null) {
+    context.addIssue({ code: 'custom', path: ['category'], message: 'Income cannot have a spending category' })
+  }
+}).transform(({ amount, type, ...transaction }) => ({
+  ...transaction,
+  amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
+}))

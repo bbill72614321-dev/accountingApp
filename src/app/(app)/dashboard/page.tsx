@@ -46,7 +46,11 @@ export default async function DashboardPage({
           <h1>{dictionary.dashboard}</h1>
           <p className="muted">{month}</p>
         </div>
-        <Link className="button button-primary" href="/transactions/new">{dictionary.newTransaction}</Link>
+        <div className="report-actions">
+          <Link className="button" href={`/reports/monthly?month=${month}`}>{dictionary.savePdf}</Link>
+          <a className="button" href={`/api/reports/monthly.xlsx?month=${month}`}>{dictionary.downloadExcel}</a>
+          <Link className="button button-primary" href="/transactions/new">{dictionary.newTransaction}</Link>
+        </div>
       </div>
       <form className="filters" method="get">
         <label htmlFor="dashboard-month">{dictionary.month}</label>

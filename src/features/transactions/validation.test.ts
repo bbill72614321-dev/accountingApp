@@ -24,6 +24,18 @@ describe('form validation', () => {
     expect(result.success).toBe(false)
   })
 
+  it('normalizes an unsigned manual expense to a negative amount', () => {
+    expect(manualTransactionSchema.parse({
+      merchant: 'Target', category: 'Grocery', date: '2026-08-01', amount: '12.34', type: 'expense', note: '',
+    }).amount).toBe(-1234)
+  })
+
+  it('normalizes an unsigned manual income to a positive amount without a category', () => {
+    expect(manualTransactionSchema.parse({
+      merchant: 'Payroll', category: '', date: '2026-08-01', amount: '100', type: 'income', note: '',
+    })).toMatchObject({ amount: 10000, category: null })
+  })
+
   it('validates both password-reset boundaries', () => {
     expect(passwordResetRequestSchema.parse({ email: ' ONE@example.com ' })).toEqual({ email: 'one@example.com' })
     expect(() => updatePasswordSchema.parse({ password: 'short', confirmation: 'short' })).toThrow()

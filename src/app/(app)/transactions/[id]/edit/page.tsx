@@ -34,7 +34,8 @@ export default async function EditTransactionPage({ params }: { params: Promise<
           categoryOverride: data.category_override,
         }),
         date: data.transaction_date,
-        amount: String(data.amount_cents / 100),
+        amount: String(Math.abs(data.amount_cents) / 100),
+        type: data.amount_cents < 0 ? 'expense' : 'income',
         note: data.note,
       }} />
       <form action={deleteTransaction} className="mt-6">

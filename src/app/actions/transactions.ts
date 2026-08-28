@@ -30,6 +30,7 @@ function manualFields(formData: FormData) {
     merchant: formData.get('merchant'),
     category: formData.get('category'),
     date: formData.get('date'),
+    type: formData.get('type'),
     amount: formData.get('amount'),
     note: formData.get('note'),
   }

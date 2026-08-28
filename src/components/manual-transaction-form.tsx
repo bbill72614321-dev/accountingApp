@@ -5,7 +5,7 @@ import type { ActionState } from '@/app/actions/transactions'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import type { Dictionary } from '@/lib/i18n'
 
-type Labels = Pick<Dictionary, 'merchant' | 'category' | 'noSpendingCategory' | 'date' | 'amount' | 'note' | 'save' | 'invalidTransaction' | 'saveTransactionFailed' | 'updateTransactionFailed'>
+type Labels = Pick<Dictionary, 'merchant' | 'category' | 'noSpendingCategory' | 'date' | 'amount' | 'transactionType' | 'expense' | 'income' | 'note' | 'save' | 'invalidTransaction' | 'saveTransactionFailed' | 'updateTransactionFailed'>
 
 const initialState: ActionState = { status: 'idle', message: '' }
 
@@ -15,6 +15,7 @@ type FormValues = {
   category?: Category | null
   date?: string
   amount?: string
+  type?: 'expense' | 'income'
   note?: string
 }
 
@@ -44,8 +45,13 @@ export function ManualTransactionForm({
       </select>
       <label htmlFor="date">{dictionary.date}</label>
       <input defaultValue={values.date} id="date" name="date" required type="date" />
+      <label htmlFor="type">{dictionary.transactionType}</label>
+      <select defaultValue={values.type ?? 'expense'} id="type" name="type">
+        <option value="expense">{dictionary.expense}</option>
+        <option value="income">{dictionary.income}</option>
+      </select>
       <label htmlFor="amount">{dictionary.amount}</label>
-      <input defaultValue={values.amount} id="amount" inputMode="decimal" name="amount" placeholder="-12.34" required />
+      <input defaultValue={values.amount} id="amount" inputMode="decimal" min="0" name="amount" placeholder="12.34" required />
       <label htmlFor="note">{dictionary.note}</label>
       <textarea defaultValue={values.note} id="note" maxLength={1000} name="note" />
       {state.status === 'error' && <p role="alert">{message}</p>}

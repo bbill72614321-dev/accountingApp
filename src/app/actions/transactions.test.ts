@@ -35,7 +35,8 @@ describe('updateManualTransaction', () => {
     formData.set('merchant', " Trader Joe's #142 ")
     formData.set('category', 'Cat')
     formData.set('date', '2026-08-27')
-    formData.set('amount', '-12.34')
+    formData.set('amount', '12.34')
+    formData.set('type', 'expense')
     formData.set('note', ' Cat food ')
 
     await updateManualTransaction({ status: 'idle', message: '' }, formData)
