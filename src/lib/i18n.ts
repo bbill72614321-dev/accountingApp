@@ -8,6 +8,8 @@ export type Dictionary = {
   dashboard: string; transactions: string; settings: string; merchant: string; category: string
   date: string; amount: string; transactionType: string; expense: string; income: string; note: string; totalSpending: string
   netAmount: string; newTransaction: string; save: string; filters: string
+  spentThisMonth: string; needsReview: string; ready: string; manual: string; imported: string
+  clearFilters: string; results: string; noFilteredTransactions: string
   month: string; search: string; language: string; signOut: string
   noTransactions: string; noCategorySpending: string; noSpendingCategory: string
   syncLater: string; included: string; excluded: string; edit: string; delete: string
@@ -26,6 +28,8 @@ export const dictionaries: Record<Language, Dictionary> = {
     dashboard: 'Dashboard', transactions: 'Transactions', settings: 'Settings', merchant: 'Merchant', category: 'Category',
     date: 'Date', amount: 'Amount', transactionType: 'Type', expense: 'Expense', income: 'Income', note: 'Note', totalSpending: 'Total spending',
     netAmount: 'Net amount', newTransaction: 'New transaction', save: 'Save', filters: 'Filters',
+    spentThisMonth: 'Spent this month', needsReview: 'Needs review', ready: 'Ready', manual: 'Manual', imported: 'Imported',
+    clearFilters: 'Clear filters', results: 'results', noFilteredTransactions: 'No transactions match these filters.',
     month: 'Month', search: 'Search', language: 'Language', signOut: 'Sign out',
     noTransactions: 'No transactions found.', noCategorySpending: 'No category spending this month.',
     noSpendingCategory: 'Income / no spending category', syncLater: 'Bank sync is added in Phase 2.',
@@ -45,6 +49,8 @@ export const dictionaries: Record<Language, Dictionary> = {
     dashboard: '每月結算', transactions: '交易紀錄', settings: '設定', merchant: '商家', category: '分類',
     date: '日期', amount: '金額', transactionType: '類型', expense: '支出', income: '收入', note: '備註', totalSpending: '支出',
     netAmount: '淨額', newTransaction: '新增交易', save: '儲存', filters: '篩選',
+    spentThisMonth: '本月支出', needsReview: '待確認', ready: '已確認', manual: '手動輸入', imported: '匯入',
+    clearFilters: '清除篩選', results: '筆結果', noFilteredTransactions: '沒有符合這些篩選條件的交易紀錄。',
     month: '月份', search: '搜尋', language: '語言', signOut: '登出',
     noTransactions: '找不到交易紀錄。', noCategorySpending: '本月尚無分類支出。',
     noSpendingCategory: '收入／不列支出分類', syncLater: '銀行同步會在第二階段加入。',
