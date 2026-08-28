@@ -27,7 +27,7 @@ export default async function TransactionsPage({
   const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   let query = supabase.from('transactions').select(
-    'id, raw_description, source_category, category_override, transaction_date, amount_cents, note, include_in_report',
+    'id, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, include_in_report',
   ).eq('user_id', user.id).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)

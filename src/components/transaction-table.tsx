@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {
+  deleteTransaction,
   setTransactionIncluded,
   updateTransactionCategory,
   updateTransactionNote,
@@ -8,6 +9,7 @@ import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/fea
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
 import type { Dictionary } from '@/lib/i18n'
+import { canDeleteTransaction } from '@/lib/ui-state'
 
 export type TransactionRow = {
   id: string
@@ -18,6 +20,7 @@ export type TransactionRow = {
   amount_cents: number
   note: string
   include_in_report: boolean
+  source: string
 }
 
 export function TransactionTable({ rows, language = 'en', dictionary }: { rows: TransactionRow[]; language?: Language; dictionary: Dictionary }) {
@@ -65,6 +68,12 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                       </button>
                     </form>
                     <Link href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>
+                    {canDeleteTransaction(row.source) && (
+                      <form action={deleteTransaction}>
+                        <input name="transaction_id" type="hidden" value={row.id} />
+                        <button className="text-red-700 underline" type="submit">{dictionary.delete}</button>
+                      </form>
+                    )}
                   </div>
                 </td>
               </tr>
