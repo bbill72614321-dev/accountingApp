@@ -13,6 +13,7 @@ export type Dictionary = {
   month: string; search: string; language: string; signOut: string
   noTransactions: string; noCategorySpending: string; noSpendingCategory: string
   syncLater: string; included: string; excluded: string; edit: string; delete: string
+  deleteConfirmation: string
   merchantRules: string; noMerchantRules: string
   traditionalChinese: string; english: string
   invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
@@ -34,6 +35,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     noTransactions: 'No transactions found.', noCategorySpending: 'No category spending this month.',
     noSpendingCategory: 'Income / no spending category', syncLater: 'Bank sync is added in Phase 2.',
     included: 'Included', excluded: 'Excluded', edit: 'Edit', delete: 'Delete',
+    deleteConfirmation: 'Delete this manual transaction? This cannot be undone.',
     merchantRules: 'Merchant rules', noMerchantRules: 'No merchant rules yet.', invalidLogin: 'Unable to sign in.',
     traditionalChinese: 'Traditional Chinese', english: 'English',
     invalidTransaction: 'Check the transaction fields and try again.',
@@ -55,6 +57,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     noTransactions: '找不到交易紀錄。', noCategorySpending: '本月尚無分類支出。',
     noSpendingCategory: '收入／不列支出分類', syncLater: '銀行同步會在第二階段加入。',
     included: '列入結算', excluded: '不列入結算', edit: '編輯', delete: '刪除',
+    deleteConfirmation: '要刪除這筆手動交易嗎？此操作無法復原。',
     merchantRules: '商家分類規則', noMerchantRules: '目前沒有商家分類規則。', invalidLogin: '無法登入。',
     traditionalChinese: '繁體中文', english: '英文',
     invalidTransaction: '請檢查交易欄位後再試。',

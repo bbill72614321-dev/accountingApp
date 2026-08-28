@@ -3,6 +3,7 @@ import {
   canDeleteTransaction,
   isCurrentNavigationPath,
   isPendingFilter,
+  hasTransactionFilters,
   transactionSourceLabel,
   transactionStatus,
 } from './ui-state'
@@ -37,5 +38,12 @@ describe('UI state helpers', () => {
   it('labels only manual transactions as manual', () => {
     expect(transactionSourceLabel('manual')).toBe('manual')
     expect(transactionSourceLabel('plaid')).toBe('imported')
+  })
+
+  it('recognizes any active transaction filter', () => {
+    expect(hasTransactionFilters({})).toBe(false)
+    expect(hasTransactionFilters({ month: '2026-08' })).toBe(true)
+    expect(hasTransactionFilters({ category: 'Grocery', q: 'whole foods' })).toBe(true)
+    expect(hasTransactionFilters({ review: 'pending' })).toBe(true)
   })
 })

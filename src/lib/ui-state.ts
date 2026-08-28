@@ -17,3 +17,12 @@ export function isPendingFilter(value: string | undefined) {
 export function transactionSourceLabel(source: string) {
   return source === 'manual' ? 'manual' : 'imported'
 }
+
+export function hasTransactionFilters(filters: {
+  month?: string
+  category?: string
+  q?: string
+  review?: string
+}) {
+  return Boolean(filters.month || filters.category || filters.q || isPendingFilter(filters.review))
+}
