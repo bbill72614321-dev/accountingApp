@@ -30,3 +30,10 @@ export function summarizeMonth(
   const totalSpendingCents = Math.max(0, Object.values(categorySpending).reduce((sum, value) => sum + value, 0))
   return { totalSpendingCents, netAmountCents, categorySpending }
 }
+
+export function countPendingMonth(
+  transactions: readonly SummaryTransaction[],
+  month: `${number}-${string}`,
+) {
+  return transactions.filter((transaction) => transaction.pending && transaction.date.startsWith(`${month}-`)).length
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { summarizeMonth, type SummaryTransaction } from './monthly-summary'
+import { countPendingMonth, summarizeMonth, type SummaryTransaction } from './monthly-summary'
 
 const tx = (overrides: Partial<SummaryTransaction>): SummaryTransaction => ({
   date: '2026-08-10', amountCents: -1000, category: 'Other',
@@ -21,5 +21,13 @@ describe('summarizeMonth', () => {
     expect(summary.netAmountCents).toBe(6000)
     expect(summary.categorySpending.Grocery).toBe(4000)
     expect(summary.categorySpending.Travel).toBe(0)
+  })
+
+  it('counts only in-month pending transactions for review', () => {
+    expect(countPendingMonth([
+      tx({ pending: true }),
+      tx({ pending: false }),
+      tx({ pending: true, date: '2026-07-31' }),
+    ], '2026-08')).toBe(1)
   })
 })
