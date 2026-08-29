@@ -81,7 +81,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   <div className="ledger-actions">
                     <form action={setTransactionIncluded}>
                       <input name="transaction_id" type="hidden" value={row.id} />
-                      <button className="ledger-button" name="included" type="submit" value={String(!row.include_in_report)}>
+                      <button className="ledger-button ledger-report-toggle" name="included" type="submit" value={String(!row.include_in_report)}>
                         {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
                       </button>
                     </form>
