@@ -41,6 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 .worktrees/
+.scratch/
 .superpowers/
 .env.local
 .env.*.local
