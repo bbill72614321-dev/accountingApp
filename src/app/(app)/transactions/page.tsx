@@ -71,7 +71,7 @@ export default async function TransactionsPage({
           <option value="">—</option>
           <option value="pending">{dictionary.needsReview}</option>
         </select>
-        <button type="submit">{dictionary.filters}</button>
+        <button className="button" type="submit">{dictionary.filters}</button>
         {hasFilters && <Link className="button" href="/transactions">{dictionary.clearFilters}</Link>}
       </form>
       <div className="ledger-summary-strip">

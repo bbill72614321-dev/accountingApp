@@ -74,7 +74,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   {row.source === 'plaid' && row.provider_pending
                     ? <span className="status-label is-pending">{dictionary.bankPending}</span>
                     : row.source === 'plaid' && row.review_status === 'needs_review'
-                      ? <form action={confirmImportedTransaction} className="ledger-inline-form"><input name="transaction_id" type="hidden" value={row.id} /><span className="status-label is-pending">{dictionary.needsReview}</span><button type="submit">{dictionary.confirm}</button></form>
+                      ? <form action={confirmImportedTransaction} className="ledger-inline-form ledger-review-form"><input name="transaction_id" type="hidden" value={row.id} /><span className="status-label is-pending">{dictionary.needsReview}</span><button className="ledger-button" type="submit">{dictionary.confirm}</button></form>
                       : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
                 <td data-label={dictionary.edit}>
