@@ -59,8 +59,7 @@ create index bank_accounts_user_idx on public.bank_accounts (user_id);
 create index bank_accounts_item_idx on public.bank_accounts (bank_item_id);
 create index transactions_bank_account_date_idx on public.transactions (bank_account_id, transaction_date desc)
   where bank_account_id is not null;
-create index transactions_plaid_review_idx on public.transactions (user_id, review_status, transaction_date desc)
-  where source = 'plaid';
+create index transactions_review_idx on public.transactions (user_id, source, review_status, transaction_date desc);
 
 create trigger bank_items_updated_at before update on public.bank_items
 for each row execute function public.set_updated_at();
