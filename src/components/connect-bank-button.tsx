@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePlaidLink } from 'react-plaid-link'
+import { responseErrorMessage } from '@/lib/http'
 
 export function ConnectBankButton({ label }: { label: string }) {
   const [token, setToken] = useState<string | null>(null)
@@ -19,7 +20,7 @@ export function ConnectBankButton({ label }: { label: string }) {
       const response = await fetch('/api/plaid/exchange', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publicToken }),
       })
-      if (!response.ok) setMessage((await response.json()).error ?? 'Unable to connect bank')
+      if (!response.ok) setMessage(await responseErrorMessage(response, 'Unable to connect bank'))
       else window.location.reload()
     },
   })
