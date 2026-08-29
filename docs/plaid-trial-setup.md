@@ -4,7 +4,7 @@ Do these steps yourself in Plaid, Supabase, and Vercel. Do not send bank passwor
 
 ## 1. Apply the database migration
 
-In Supabase SQL Editor, run the contents of `supabase/migrations/202608280001_plaid_transactions.sql`. This adds the private Plaid tables and transaction review fields.
+In Supabase SQL Editor, run the migrations in filename order: `202608280001_plaid_transactions.sql`, then `202608280002_make_transaction_external_id_upsertable.sql`. They add the private Plaid tables, transaction review fields, and the unique index required for sync upserts.
 
 ## 2. Create Plaid credentials
 
