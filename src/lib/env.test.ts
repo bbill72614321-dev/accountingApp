@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
-import { getPublicEnv, getServerEnv } from './env'
+import { getPlaidEnv, getPublicEnv, getServerEnv, getSupabaseAdminEnv } from './env'
 
 const original = { ...process.env }
 
@@ -32,5 +32,33 @@ describe('getPublicEnv', () => {
     }
 
     expect(getServerEnv().appUrl).toBe('http://127.0.0.1:3000')
+  })
+})
+
+describe('getPlaidEnv', () => {
+  it('accepts server-only Plaid configuration', () => {
+    process.env.PLAID_CLIENT_ID = 'client-id'
+    process.env.PLAID_SECRET = 'secret'
+    process.env.PLAID_ENV = 'production'
+    process.env.PLAID_TOKEN_ENCRYPTION_KEY = Buffer.alloc(32, 4).toString('base64')
+
+    expect(getPlaidEnv()).toEqual({
+      clientId: 'client-id',
+      secret: 'secret',
+      environment: 'production',
+      tokenEncryptionKey: Buffer.alloc(32, 4).toString('base64'),
+    })
+  })
+})
+
+describe('getSupabaseAdminEnv', () => {
+  it('requires the server-only Supabase service role key', () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://127.0.0.1:54321'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key'
+
+    expect(getSupabaseAdminEnv()).toEqual({
+      supabaseUrl: 'http://127.0.0.1:54321',
+      serviceRoleKey: 'service-role-key',
+    })
   })
 })
