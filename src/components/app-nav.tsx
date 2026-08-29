@@ -8,6 +8,7 @@ import { isCurrentNavigationPath } from '@/lib/ui-state'
 const links = [
   { href: '/dashboard', key: 'dashboard' as const },
   { href: '/transactions', key: 'transactions' as const },
+  { href: '/banks', key: 'bankConnections' as const },
   { href: '/settings', key: 'settings' as const },
 ]
 

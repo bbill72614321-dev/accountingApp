@@ -49,4 +49,6 @@ The E2E test creates a transaction as the first user, confirms the second user c
 
 Production must use two invited users and public sign-ups must be disabled. Never expose development or production credentials in `.env.local` commits, tests, or documentation.
 
+For the Plaid Trial connection and launch checklist, see [Plaid Trial setup](docs/plaid-trial-setup.md).
+
 See the [approved design](docs/superpowers/specs/2026-08-26-personal-finance-web-app-design.md) and [implementation roadmap](docs/superpowers/plans/README.md).

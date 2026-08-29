@@ -5,7 +5,7 @@ import { createServerClient } from '@/lib/supabase/server'
 export type Dictionary = {
   login: string; email: string; password: string; forgotPassword: string
   sendResetLink: string; resetPassword: string; confirmPassword: string
-  dashboard: string; transactions: string; settings: string; merchant: string; category: string
+  dashboard: string; transactions: string; bankConnections: string; settings: string; merchant: string; category: string
   date: string; amount: string; transactionType: string; expense: string; income: string; note: string; totalSpending: string
   netAmount: string; newTransaction: string; save: string; filters: string
   spentThisMonth: string; needsReview: string; bankPending: string; confirm: string; ready: string; manual: string; imported: string
@@ -20,13 +20,14 @@ export type Dictionary = {
   invalidLogin: string; resetSent: string; updateFailed: string
   recoveryExpired: string; passwordUpdated: string; privateLedgerDescription: string
   downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; transactionDetails: string
+  connectBank: string; bankConnectionsDescription: string; noBankConnections: string
 }
 
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
     login: 'Sign in', email: 'Email', password: 'Password', forgotPassword: 'Forgot password?',
     sendResetLink: 'Send reset link', resetPassword: 'Reset password', confirmPassword: 'Confirm password',
-    dashboard: 'Dashboard', transactions: 'Transactions', settings: 'Settings', merchant: 'Merchant', category: 'Category',
+    dashboard: 'Dashboard', transactions: 'Transactions', bankConnections: 'Bank connections', settings: 'Settings', merchant: 'Merchant', category: 'Category',
     date: 'Date', amount: 'Amount', transactionType: 'Type', expense: 'Expense', income: 'Income', note: 'Note', totalSpending: 'Total spending',
     netAmount: 'Net amount', newTransaction: 'New transaction', save: 'Save', filters: 'Filters',
     spentThisMonth: 'Spent this month', needsReview: 'Needs review', bankPending: 'Bank pending', confirm: 'Confirm', ready: 'Ready', manual: 'Manual', imported: 'Imported',
@@ -45,11 +46,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     privateLedgerDescription: 'Your monthly picture, kept personal.',
     downloadExcel: 'Download Excel', savePdf: 'Save as PDF', monthlySummary: 'Monthly summary',
     categorySummary: 'Category summary', transactionDetails: 'Transaction details',
+    connectBank: 'Connect bank', bankConnectionsDescription: 'Connected accounts stay private to this login.', noBankConnections: 'No bank connections yet.',
   },
   'zh-TW': {
     login: '登入', email: '電子郵件', password: '密碼', forgotPassword: '忘記密碼？',
     sendResetLink: '寄送重設連結', resetPassword: '重設密碼', confirmPassword: '確認密碼',
-    dashboard: '每月結算', transactions: '交易紀錄', settings: '設定', merchant: '商家', category: '分類',
+    dashboard: '每月結算', transactions: '交易紀錄', bankConnections: '銀行連線', settings: '設定', merchant: '商家', category: '分類',
     date: '日期', amount: '金額', transactionType: '類型', expense: '支出', income: '收入', note: '備註', totalSpending: '支出',
     netAmount: '淨額', newTransaction: '新增交易', save: '儲存', filters: '篩選',
     spentThisMonth: '本月支出', needsReview: '待確認', bankPending: '銀行待入帳', confirm: '確認', ready: '已確認', manual: '手動輸入', imported: '匯入',
@@ -68,6 +70,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     privateLedgerDescription: '你的每月帳務，只屬於你。',
     downloadExcel: '下載 Excel', savePdf: '另存為 PDF', monthlySummary: '每月結算',
     categorySummary: '分類結算', transactionDetails: '交易明細',
+    connectBank: '連接銀行', bankConnectionsDescription: '連線帳戶只會屬於目前登入者。', noBankConnections: '尚未連接銀行帳戶。',
   },
 }
 
