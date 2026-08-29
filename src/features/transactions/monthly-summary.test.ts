@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countPendingMonth, summarizeMonth, type SummaryTransaction } from './monthly-summary'
+import { countPendingMonth, isReportEligible, summarizeMonth, type SummaryTransaction } from './monthly-summary'
 
 const tx = (overrides: Partial<SummaryTransaction>): SummaryTransaction => ({
   date: '2026-08-10', amountCents: -1000, category: 'Other',
@@ -7,6 +7,12 @@ const tx = (overrides: Partial<SummaryTransaction>): SummaryTransaction => ({
 })
 
 describe('summarizeMonth', () => {
+  it('includes only confirmed, posted USD transactions in reports', () => {
+    expect(isReportEligible({ includeInReport: true, providerPending: false, reviewStatus: 'confirmed', currency: 'USD' })).toBe(true)
+    expect(isReportEligible({ includeInReport: true, providerPending: false, reviewStatus: 'needs_review', currency: 'USD' })).toBe(false)
+    expect(isReportEligible({ includeInReport: true, providerPending: true, reviewStatus: 'confirmed', currency: 'USD' })).toBe(false)
+  })
+
   it('calculates spending, refunds, income, exclusions, and net amount', () => {
     const summary = summarizeMonth([
       tx({ amountCents: -5000, category: 'Grocery' }),

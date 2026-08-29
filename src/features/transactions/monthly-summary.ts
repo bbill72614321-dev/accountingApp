@@ -6,6 +6,23 @@ export type SummaryTransaction = {
   category: Category | null
   pending: boolean
   includeInReport: boolean
+  providerPending?: boolean
+  reviewStatus?: 'confirmed' | 'needs_review'
+  currency?: string | null
+}
+
+export type ReportEligibility = {
+  includeInReport: boolean
+  providerPending: boolean
+  reviewStatus: 'confirmed' | 'needs_review'
+  currency: string | null
+}
+
+export function isReportEligible(transaction: ReportEligibility) {
+  return transaction.includeInReport
+    && !transaction.providerPending
+    && transaction.reviewStatus === 'confirmed'
+    && transaction.currency === 'USD'
 }
 
 export type MonthlySummary = {
@@ -22,7 +39,12 @@ export function summarizeMonth(
   let netAmountCents = 0
 
   for (const transaction of transactions) {
-    if (!transaction.date.startsWith(`${month}-`) || transaction.pending || !transaction.includeInReport) continue
+    if (!transaction.date.startsWith(`${month}-`) || !isReportEligible({
+      includeInReport: transaction.includeInReport,
+      providerPending: transaction.providerPending ?? transaction.pending,
+      reviewStatus: transaction.reviewStatus ?? 'confirmed',
+      currency: transaction.currency ?? 'USD',
+    })) continue
     netAmountCents += transaction.amountCents
     if (transaction.category) categorySpending[transaction.category] -= transaction.amountCents
   }

@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(31);
+select plan(37);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
 values
@@ -16,6 +16,19 @@ insert into public.merchant_rules (id, user_id, normalized_merchant, category)
 values
   ('cccccccc-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'ALPHA', 'Grocery'),
   ('dddddddd-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'BETA', 'Travel');
+
+insert into public.bank_items (id, user_id, plaid_item_id, institution_name, status)
+values
+  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '11111111-1111-1111-1111-111111111111', 'item-user-one', 'Chase', 'active'),
+  ('ffffffff-ffff-ffff-ffff-ffffffffffff', '22222222-2222-2222-2222-222222222222', 'item-user-two', 'Amex', 'active');
+
+insert into public.bank_accounts (id, user_id, bank_item_id, plaid_account_id, name, mask, type, subtype)
+values
+  ('12121212-1212-1212-1212-121212121212', '11111111-1111-1111-1111-111111111111', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'account-user-one', 'Freedom', '1234', 'credit', 'credit card'),
+  ('34343434-3434-3434-3434-343434343434', '22222222-2222-2222-2222-222222222222', 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'account-user-two', 'Gold', '5678', 'credit', 'credit card');
+
+insert into public.plaid_item_secrets (bank_item_id, access_token_ciphertext, access_token_iv, access_token_tag)
+values ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'ciphertext', 'iv', 'tag');
 
 set local role authenticated;
 set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
@@ -46,6 +59,16 @@ select is_empty($$delete from public.transactions where user_id = '22222222-2222
 select throws_ok(
   $$insert into public.transactions (user_id, source, normalized_merchant, transaction_date, amount_cents) values ('22222222-2222-2222-2222-222222222222', 'manual', 'FORGED', '2026-08-03', -3000)$$,
   '42501', null, 'user one cannot insert for user two'
+);
+
+select results_eq('select count(*) from public.bank_items', array[1::bigint], 'user one sees one bank item');
+select results_eq('select count(*) from public.bank_accounts', array[1::bigint], 'user one sees one bank account');
+select is_empty($$select * from public.plaid_item_secrets$$, 'authenticated users cannot read encrypted Plaid tokens');
+select is_empty($$update public.bank_items set institution_name = 'Forged' where id = 'ffffffff-ffff-ffff-ffff-ffffffffffff' returning id$$, 'user one cannot update user two bank item');
+select is_empty($$delete from public.bank_accounts where id = '34343434-3434-3434-3434-343434343434' returning id$$, 'user one cannot delete user two bank account');
+select throws_ok(
+  $$insert into public.bank_items (user_id, plaid_item_id, institution_name, status) values ('22222222-2222-2222-2222-222222222222', 'forged-item', 'Forged', 'active')$$,
+  '42501', null, 'user one cannot forge another bank item'
 );
 
 select results_eq('select count(*) from public.merchant_rules', array[1::bigint], 'user one sees one merchant rule');
