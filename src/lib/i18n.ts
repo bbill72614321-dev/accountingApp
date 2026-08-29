@@ -11,8 +11,8 @@ export type Dictionary = {
   spentThisMonth: string; needsReview: string; bankPending: string; confirm: string; ready: string; manual: string; imported: string
   clearFilters: string; results: string; noFilteredTransactions: string
   month: string; search: string; language: string; signOut: string
-  noTransactions: string; noCategorySpending: string; noSpendingCategory: string
-  syncLater: string; included: string; excluded: string; edit: string; delete: string
+  noTransactions: string; noCategorySpending: string; noSpendingCategory: string; chooseCategory: string
+  syncLater: string; included: string; excluded: string; includeInReport: string; excludeFromReport: string; edit: string; delete: string
   deleteConfirmation: string
   merchantRules: string; noMerchantRules: string
   traditionalChinese: string; english: string
@@ -34,8 +34,8 @@ export const dictionaries: Record<Language, Dictionary> = {
     clearFilters: 'Clear filters', results: 'results', noFilteredTransactions: 'No transactions match these filters.',
     month: 'Month', search: 'Search', language: 'Language', signOut: 'Sign out',
     noTransactions: 'No transactions found.', noCategorySpending: 'No category spending this month.',
-    noSpendingCategory: 'Income / no spending category', syncLater: 'Bank sync is added in Phase 2.',
-    included: 'Included', excluded: 'Excluded', edit: 'Edit', delete: 'Delete',
+    noSpendingCategory: 'Income / no spending category', chooseCategory: 'Choose a category', syncLater: 'Bank sync is added in Phase 2.',
+    included: 'Included', excluded: 'Excluded', includeInReport: 'Include in report', excludeFromReport: 'Exclude from report', edit: 'Edit', delete: 'Delete',
     deleteConfirmation: 'Delete this manual transaction? This cannot be undone.',
     merchantRules: 'Merchant rules', noMerchantRules: 'No merchant rules yet.', invalidLogin: 'Unable to sign in.',
     traditionalChinese: 'Traditional Chinese', english: 'English',
@@ -58,8 +58,8 @@ export const dictionaries: Record<Language, Dictionary> = {
     clearFilters: '清除篩選', results: '筆結果', noFilteredTransactions: '沒有符合這些篩選條件的交易紀錄。',
     month: '月份', search: '搜尋', language: '語言', signOut: '登出',
     noTransactions: '找不到交易紀錄。', noCategorySpending: '本月尚無分類支出。',
-    noSpendingCategory: '收入／不列支出分類', syncLater: '銀行同步會在第二階段加入。',
-    included: '列入結算', excluded: '不列入結算', edit: '編輯', delete: '刪除',
+    noSpendingCategory: '收入／不列支出分類', chooseCategory: '請選擇分類', syncLater: '銀行同步會在第二階段加入。',
+    included: '列入結算', excluded: '不列入結算', includeInReport: '列入結算', excludeFromReport: '不列入結算', edit: '編輯', delete: '刪除',
     deleteConfirmation: '要刪除這筆手動交易嗎？此操作無法復原。',
     merchantRules: '商家分類規則', noMerchantRules: '目前沒有商家分類規則。', invalidLogin: '無法登入。',
     traditionalChinese: '繁體中文', english: '英文',

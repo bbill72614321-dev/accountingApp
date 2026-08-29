@@ -12,7 +12,7 @@ export function DeleteTransactionForm({ transactionId, label, confirmation }: {
       if (!window.confirm(confirmation)) event.preventDefault()
     }}>
       <input name="transaction_id" type="hidden" value={transactionId} />
-      <button className="ledger-delete" type="submit">{label}</button>
+      <button className="ledger-button ledger-delete" type="submit">{label}</button>
     </form>
   )
 }

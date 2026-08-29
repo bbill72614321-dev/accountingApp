@@ -2,6 +2,10 @@ import { z } from 'zod'
 import { CATEGORIES } from './categories'
 import { parseUsdToCents } from './money'
 
+export function canUseIncomeCategory(amountCents: number) {
+  return amountCents >= 0
+}
+
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8).max(128),

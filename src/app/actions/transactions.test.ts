@@ -8,7 +8,7 @@ vi.mock('@/lib/supabase/server', () => ({ createServerClient }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }))
 
-import { confirmImportedTransaction, createManualTransaction, updateManualTransaction } from './transactions'
+import { confirmImportedTransaction, createManualTransaction, updateManualTransaction, updateTransactionCategory } from './transactions'
 
 describe('transaction action messages', () => {
   it('returns a dictionary key for invalid manual transaction fields', async () => {
@@ -69,5 +69,21 @@ describe('confirmImportedTransaction', () => {
     formData.set('transaction_id', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')
 
     await expect(confirmImportedTransaction(formData)).rejects.toThrow('Unable to confirm transaction')
+  })
+})
+
+describe('updateTransactionCategory', () => {
+  it('rejects an uncategorized expense even if a form bypasses the disabled option', async () => {
+    const maybeSingle = vi.fn(async () => ({ data: { amount_cents: -1200 }, error: null }))
+    const byUser = vi.fn(() => ({ maybeSingle }))
+    const byId = vi.fn(() => ({ eq: byUser }))
+    const select = vi.fn(() => ({ eq: byId }))
+    const from = vi.fn(() => ({ select }))
+    createServerClient.mockResolvedValue({ from, rpc: vi.fn() })
+    const formData = new FormData()
+    formData.set('transaction_id', 'cccccccc-cccc-4ccc-8ccc-cccccccccccc')
+    formData.set('category', '')
+
+    await expect(updateTransactionCategory(formData)).rejects.toThrow('Unable to update transaction category')
   })
 })

@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { CATEGORIES } from '@/features/transactions/categories'
 import { normalizeMerchant } from '@/features/transactions/merchant'
-import { manualTransactionSchema } from '@/features/transactions/validation'
+import { canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
 
@@ -14,7 +14,7 @@ export type ActionState = { status: 'idle' | 'success' | 'error'; message: strin
 const transactionIdSchema = z.string().uuid()
 const transactionCategorySchema = z.object({
   transactionId: transactionIdSchema,
-  category: z.enum(CATEGORIES),
+  category: z.preprocess((value) => value === '' ? null : value, z.enum(CATEGORIES).nullable()),
 })
 const transactionNoteSchema = z.object({
   transactionId: transactionIdSchema,
@@ -104,13 +104,18 @@ export async function deleteTransaction(formData: FormData): Promise<void> {
 }
 
 export async function updateTransactionCategory(formData: FormData): Promise<void> {
-  await requireUser()
+  const user = await requireUser()
   const parsed = transactionCategorySchema.safeParse({
     transactionId: formData.get('transaction_id'), category: formData.get('category'),
   })
   if (!parsed.success) throw new Error('Invalid transaction category')
 
   const supabase = await createServerClient()
+  const { data: transaction, error: transactionError } = await supabase.from('transactions').select('amount_cents')
+    .eq('id', parsed.data.transactionId).eq('user_id', user.id).maybeSingle()
+  if (transactionError || !transaction || (!canUseIncomeCategory(transaction.amount_cents) && parsed.data.category === null)) {
+    throw new Error('Unable to update transaction category')
+  }
   const { error } = await supabase.rpc('set_transaction_category_and_rule', {
     p_transaction_id: parsed.data.transactionId,
     p_category: parsed.data.category,

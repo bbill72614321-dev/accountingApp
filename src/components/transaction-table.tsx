@@ -9,6 +9,7 @@ import { DeleteTransactionForm } from '@/components/delete-transaction-form'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
+import { canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
 import { canDeleteTransaction, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
@@ -51,10 +52,12 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                     <input name="transaction_id" type="hidden" value={row.id} />
                     <label className="sr-only" htmlFor={`category-${row.id}`}>{dictionary.category}</label>
                     <select defaultValue={category ?? ''} id={`category-${row.id}`} name="category">
-                      <option disabled value="">{dictionary.noSpendingCategory}</option>
+                      {canUseIncomeCategory(row.amount_cents)
+                        ? <option value="">{dictionary.noSpendingCategory}</option>
+                        : <option disabled value="">{dictionary.chooseCategory}</option>}
                       {CATEGORIES.map((item) => <option key={item} value={item}>{CATEGORY_LABELS[item][language]}</option>)}
                     </select>
-                    <button type="submit">{dictionary.save}</button>
+                    <button className="ledger-button" type="submit">{dictionary.save}</button>
                   </form>
                 </td>
                 <td data-label={dictionary.date}>{row.transaction_date}</td>
@@ -64,7 +67,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                     <input name="transaction_id" type="hidden" value={row.id} />
                     <label className="sr-only" htmlFor={`note-${row.id}`}>{dictionary.note}</label>
                     <input defaultValue={row.note} id={`note-${row.id}`} maxLength={1000} name="note" />
-                    <button type="submit">{dictionary.save}</button>
+                    <button className="ledger-button" type="submit">{dictionary.save}</button>
                   </form>
                 </td>
                 <td data-label={dictionary.needsReview}>
@@ -76,14 +79,13 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                 </td>
                 <td data-label={dictionary.edit}>
                   <div className="ledger-actions">
-                    <span>{row.include_in_report ? dictionary.included : dictionary.excluded}</span>
                     <form action={setTransactionIncluded}>
                       <input name="transaction_id" type="hidden" value={row.id} />
-                      <button name="included" type="submit" value={String(!row.include_in_report)}>
-                        {row.include_in_report ? dictionary.excluded : dictionary.included}
+                      <button className="ledger-button" name="included" type="submit" value={String(!row.include_in_report)}>
+                        {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
                       </button>
                     </form>
-                    <Link href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>
+                    <Link className="ledger-button" href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>
                     {canDeleteTransaction(row.source) && (
                       <DeleteTransactionForm confirmation={dictionary.deleteConfirmation} label={dictionary.delete} transactionId={row.id} />
                     )}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  canUseIncomeCategory,
   loginSchema,
   manualTransactionSchema,
   passwordResetRequestSchema,
@@ -7,6 +8,12 @@ import {
 } from './validation'
 
 describe('form validation', () => {
+  it('allows the income-only category only for non-negative amounts', () => {
+    expect(canUseIncomeCategory(-1)).toBe(false)
+    expect(canUseIncomeCategory(0)).toBe(true)
+    expect(canUseIncomeCategory(1)).toBe(true)
+  })
+
   it('normalizes a valid login', () => {
     expect(loginSchema.parse({ email: ' ONE@example.com ', password: 'long-enough' }).email).toBe('one@example.com')
   })
