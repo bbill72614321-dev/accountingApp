@@ -25,7 +25,7 @@ export default async function DashboardPage({
   const user = await requireUser()
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
-    'raw_description, transaction_date, amount_cents, source_category, category_override, pending, include_in_report',
+    'raw_description, transaction_date, amount_cents, source_category, category_override, pending, provider_pending, review_status, include_in_report',
   ).eq('user_id', user.id).gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
     .order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load monthly summary')
@@ -35,6 +35,8 @@ export default async function DashboardPage({
     amountCents: row.amount_cents,
     category: (row.category_override ?? row.source_category) as Category | null,
     pending: row.pending,
+    providerPending: row.provider_pending,
+    reviewStatus: row.review_status,
     includeInReport: row.include_in_report,
   }))
   const summary = summarizeMonth(transactions, month as `${number}-${string}`)

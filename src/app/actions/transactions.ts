@@ -148,6 +148,22 @@ export async function setTransactionIncluded(formData: FormData): Promise<void> 
   revalidateLedger()
 }
 
+export async function confirmImportedTransaction(formData: FormData): Promise<void> {
+  const user = await requireUser()
+  const id = transactionIdSchema.safeParse(formData.get('transaction_id'))
+  if (!id.success) throw new Error('Invalid transaction')
+
+  const supabase = await createServerClient()
+  const { data, error } = await supabase.from('transactions').update({
+    review_status: 'confirmed',
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: user.id,
+  }).eq('id', id.data).eq('user_id', user.id).eq('source', 'plaid')
+    .eq('provider_pending', false).eq('review_status', 'needs_review').select('id').maybeSingle()
+  if (error || !data) throw new Error('Unable to confirm transaction')
+  revalidateLedger()
+}
+
 export async function deleteMerchantRule(formData: FormData): Promise<void> {
   const user = await requireUser()
   const id = transactionIdSchema.safeParse(formData.get('rule_id'))

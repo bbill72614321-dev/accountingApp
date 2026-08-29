@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {
+  confirmImportedTransaction,
   setTransactionIncluded,
   updateTransactionCategory,
   updateTransactionNote,
@@ -22,6 +23,8 @@ export type TransactionRow = {
   include_in_report: boolean
   source: string
   pending: boolean
+  provider_pending?: boolean
+  review_status?: 'confirmed' | 'needs_review'
 }
 
 export function TransactionTable({ rows, language = 'en', dictionary }: { rows: TransactionRow[]; language?: Language; dictionary: Dictionary }) {
@@ -65,7 +68,11 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   </form>
                 </td>
                 <td data-label={dictionary.needsReview}>
-                  <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>
+                  {row.source === 'plaid' && row.provider_pending
+                    ? <span className="status-label is-pending">{dictionary.bankPending}</span>
+                    : row.source === 'plaid' && row.review_status === 'needs_review'
+                      ? <form action={confirmImportedTransaction} className="ledger-inline-form"><input name="transaction_id" type="hidden" value={row.id} /><span className="status-label is-pending">{dictionary.needsReview}</span><button type="submit">{dictionary.confirm}</button></form>
+                      : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
                 <td data-label={dictionary.edit}>
                   <div className="ledger-actions">

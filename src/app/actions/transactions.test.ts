@@ -8,7 +8,7 @@ vi.mock('@/lib/supabase/server', () => ({ createServerClient }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }))
 
-import { createManualTransaction, updateManualTransaction } from './transactions'
+import { confirmImportedTransaction, createManualTransaction, updateManualTransaction } from './transactions'
 
 describe('transaction action messages', () => {
   it('returns a dictionary key for invalid manual transaction fields', async () => {
@@ -50,5 +50,24 @@ describe('updateManualTransaction', () => {
       p_amount_cents: -1234,
       p_note: 'Cat food',
     })
+  })
+})
+
+describe('confirmImportedTransaction', () => {
+  it('rejects confirming another user\'s imported transaction', async () => {
+    const maybeSingle = vi.fn(async () => ({ data: null, error: null }))
+    const select = vi.fn(() => ({ maybeSingle }))
+    const reviewStatus = vi.fn(() => ({ select }))
+    const providerPending = vi.fn(() => ({ eq: reviewStatus }))
+    const source = vi.fn(() => ({ eq: providerPending }))
+    const user = vi.fn(() => ({ eq: source }))
+    const id = vi.fn(() => ({ eq: user }))
+    const update = vi.fn(() => ({ eq: id }))
+    const from = vi.fn(() => ({ update }))
+    createServerClient.mockResolvedValue({ from })
+    const formData = new FormData()
+    formData.set('transaction_id', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')
+
+    await expect(confirmImportedTransaction(formData)).rejects.toThrow('Unable to confirm transaction')
   })
 })

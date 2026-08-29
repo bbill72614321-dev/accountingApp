@@ -1,5 +1,5 @@
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from './categories'
-import { summarizeMonth, type SummaryTransaction } from './monthly-summary'
+import { isReportEligible, summarizeMonth, type SummaryTransaction } from './monthly-summary'
 
 export type MonthlyExportTransaction = SummaryTransaction & {
   merchant: string
@@ -17,7 +17,12 @@ export function buildMonthlyExportData({
 }) {
   const summary = summarizeMonth(transactions, month)
   const transactionRows = transactions
-    .filter((transaction) => transaction.date.startsWith(`${month}-`) && !transaction.pending && transaction.includeInReport)
+    .filter((transaction) => transaction.date.startsWith(`${month}-`) && isReportEligible({
+      includeInReport: transaction.includeInReport,
+      providerPending: transaction.providerPending ?? transaction.pending,
+      reviewStatus: transaction.reviewStatus ?? 'confirmed',
+      currency: transaction.currency ?? 'USD',
+    }))
     .map((transaction): MonthlyExportRow => [
       transaction.merchant,
       transaction.category ? CATEGORY_LABELS[transaction.category][language] : language === 'en' ? 'Income / no spending category' : '收入／不列支出分類',

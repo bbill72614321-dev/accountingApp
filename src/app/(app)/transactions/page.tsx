@@ -30,20 +30,20 @@ export default async function TransactionsPage({
   const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   let query = supabase.from('transactions').select(
-    'id, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, include_in_report',
+    'id, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, provider_pending, review_status, include_in_report',
   ).eq('user_id', user.id).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
   if (category) query = query.or(effectiveCategoryFilter(category))
   if (search) query = query.or(`raw_description.ilike.*${search}*,note.ilike.*${search}*`)
-  if (review) query = query.eq('pending', true)
+  if (review) query = query.eq('review_status', 'needs_review').eq('provider_pending', false)
 
   const { data, error } = await query
   if (error) throw new Error('Unable to load transactions')
   const rows = (data ?? []) as TransactionRow[]
   const outgoingCents = rows.reduce((total, row) => total + Math.max(0, -row.amount_cents), 0)
   const netCents = rows.reduce((total, row) => total + row.amount_cents, 0)
-  const pendingCount = rows.filter((row) => row.pending).length
+  const pendingCount = rows.filter((row) => row.source === 'plaid' ? row.review_status === 'needs_review' && !row.provider_pending : row.pending).length
   const hasFilters = hasTransactionFilters({ month, category, q: search, review })
 
   return (

@@ -22,7 +22,7 @@ export default async function PrintableMonthlyReport({ searchParams }: { searchP
   const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
-    'raw_description, note, transaction_date, amount_cents, source_category, category_override, pending, include_in_report',
+    'raw_description, note, transaction_date, amount_cents, source_category, category_override, pending, provider_pending, review_status, include_in_report',
   ).eq('user_id', user.id).eq('include_in_report', true)
     .gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
   if (error) throw new Error('Unable to load report')
@@ -31,6 +31,7 @@ export default async function PrintableMonthlyReport({ searchParams }: { searchP
     merchant: row.raw_description ?? '', note: row.note ?? '', date: row.transaction_date,
     amountCents: row.amount_cents, category: (row.category_override ?? row.source_category) as Category | null,
     pending: row.pending, includeInReport: row.include_in_report,
+    providerPending: row.provider_pending, reviewStatus: row.review_status,
   }))
   const report = buildMonthlyExportData({ language, month: month as `${number}-${string}`, transactions })
 
