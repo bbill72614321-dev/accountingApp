@@ -1,8 +1,10 @@
 'use client'
 
 import { useActionState } from 'react'
-import { disconnectBankItem, initialDisconnectBankActionState } from '@/app/actions/banks'
+import { disconnectBankItem, type DisconnectBankActionState } from '@/app/actions/banks'
 import { disconnectConfirmation } from '@/components/disconnect-confirmation'
+
+const initialDisconnectBankActionState: DisconnectBankActionState = { status: 'idle', message: '' }
 
 export function DisconnectBankForm({
   itemId,

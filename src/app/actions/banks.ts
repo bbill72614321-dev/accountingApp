@@ -13,8 +13,6 @@ const bankItemIdSchema = z.string().uuid()
 
 export type DisconnectBankActionState = { status: 'idle' | 'success' | 'error'; message: '' | 'disconnectBankError' }
 
-export const initialDisconnectBankActionState: DisconnectBankActionState = { status: 'idle', message: '' }
-
 export async function disconnectBankItem(
   _state: DisconnectBankActionState,
   formData: FormData,
