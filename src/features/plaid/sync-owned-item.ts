@@ -17,7 +17,7 @@ export type PlaidSyncPage = {
   hasMore: boolean
 }
 
-export type PlaidGateway = {
+export type PlaidGateway = PlaidItemRemovalGateway & {
   syncTransactions(input: { accessToken: string; cursor: string | null }): Promise<PlaidSyncPage>
 }
 
@@ -86,3 +86,4 @@ export async function syncOwnedItem({
     hasMore = page.hasMore
   } while (hasMore)
 }
+import type { PlaidItemRemovalGateway } from './disconnect-owned-item'

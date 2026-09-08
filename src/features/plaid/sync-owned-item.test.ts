@@ -48,6 +48,7 @@ function createRepository(): PlaidSyncRepository & {
 }
 
 const gateway: PlaidGateway = {
+  async removeItem() {},
   async syncTransactions() {
     return { added: [transaction], modified: [], removed: [], nextCursor: 'cursor-1', hasMore: false }
   },
@@ -76,6 +77,7 @@ describe('syncOwnedItem', () => {
   it('continues until Plaid reports the final cursor page', async () => {
     const repository = createRepository()
     const paginatedGateway: PlaidGateway = {
+      async removeItem() {},
       async syncTransactions({ cursor }) {
         if (!cursor) return { added: [transaction], modified: [], removed: [], nextCursor: 'cursor-page-2', hasMore: true }
         return {
@@ -95,6 +97,7 @@ describe('syncOwnedItem', () => {
 it('scopes provider removals to the synced item', async () => {
   const repository = createRepository()
   const removalGateway: PlaidGateway = {
+    async removeItem() {},
     async syncTransactions() {
       return { added: [], modified: [], removed: [{ transactionId: 'transaction-1' }], nextCursor: 'cursor-1', hasMore: false }
     },
