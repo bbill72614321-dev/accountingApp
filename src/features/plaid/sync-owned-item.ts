@@ -39,7 +39,7 @@ export type PlaidSyncRepository = {
   findOwnedItem(userId: string, itemId: string): Promise<{ accessToken: string; cursor: string | null } | null>
   upsertAccounts(itemId: string, accounts: unknown[]): Promise<void>
   upsertTransactions(rows: ImportedTransaction[]): Promise<void>
-  removeTransactions(userId: string, externalIds: string[]): Promise<void>
+  removeTransactions(userId: string, itemId: string, externalIds: string[]): Promise<void>
   updateCursor(itemId: string, cursor: string): Promise<void>
 }
 
@@ -80,7 +80,7 @@ export async function syncOwnedItem({
     const page = await gateway.syncTransactions({ accessToken: item.accessToken, cursor })
     const rows = [...page.added, ...page.modified].map((transaction) => toImportedTransaction(userId, itemId, transaction))
     if (rows.length > 0) await repository.upsertTransactions(rows)
-    if (page.removed.length > 0) await repository.removeTransactions(userId, page.removed.map(({ transactionId }) => transactionId))
+    if (page.removed.length > 0) await repository.removeTransactions(userId, itemId, page.removed.map(({ transactionId }) => transactionId))
     cursor = page.nextCursor
     if (!page.hasMore) await repository.updateCursor(itemId, cursor)
     hasMore = page.hasMore

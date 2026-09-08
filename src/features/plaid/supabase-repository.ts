@@ -21,6 +21,7 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
       if (rows.length === 0) return
       const records = rows.map((row) => ({
         user_id: row.userId, source: 'plaid', external_id: row.externalId,
+        bank_item_id: row.itemId,
         raw_description: row.rawDescription, normalized_merchant: row.normalizedMerchant,
         transaction_date: row.transactionDate, amount_cents: row.amountCents,
         pending: row.providerPending, provider_pending: row.providerPending,
@@ -29,9 +30,10 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
       const { error } = await admin.from('transactions').upsert(records, { onConflict: 'user_id,source,external_id' })
       if (error) throw new Error('Unable to save Plaid transactions')
     },
-    async removeTransactions(userId, externalIds) {
+    async removeTransactions(userId, itemId, externalIds) {
       if (externalIds.length === 0) return
-      const { error } = await admin.from('transactions').delete().eq('user_id', userId).eq('source', 'plaid').in('external_id', externalIds)
+      const { error } = await admin.from('transactions').delete()
+        .eq('user_id', userId).eq('source', 'plaid').eq('bank_item_id', itemId).in('external_id', externalIds)
       if (error) throw new Error('Unable to remove Plaid transactions')
     },
     async updateCursor(itemId, cursor) {

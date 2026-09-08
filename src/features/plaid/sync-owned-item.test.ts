@@ -17,12 +17,18 @@ const transaction = {
   currencyCode: 'USD',
 }
 
-function createRepository(): PlaidSyncRepository & { transactions: ImportedTransaction[]; cursors: string[] } {
+function createRepository(): PlaidSyncRepository & {
+  transactions: ImportedTransaction[]
+  cursors: string[]
+  removals: Array<{ userId: string; itemId: string; externalIds: string[] }>
+} {
   const transactions: ImportedTransaction[] = []
   const cursors: string[] = []
+  const removals: Array<{ userId: string; itemId: string; externalIds: string[] }> = []
   return {
     transactions,
     cursors,
+    removals,
     async findOwnedItem(userId, itemId) {
       return userId === 'user-a' && itemId === 'item-a'
         ? { accessToken: 'encrypted-token', cursor: null }
@@ -36,7 +42,7 @@ function createRepository(): PlaidSyncRepository & { transactions: ImportedTrans
         else transactions[index] = row
       }
     },
-    async removeTransactions() {},
+    async removeTransactions(userId, itemId, externalIds) { removals.push({ userId, itemId, externalIds }) },
     async updateCursor(_itemId, cursor) { cursors.push(cursor) },
   }
 }
@@ -84,4 +90,17 @@ describe('syncOwnedItem', () => {
     expect(repository.transactions).toHaveLength(2)
     expect(repository.cursors).toEqual(['cursor-final'])
   })
+})
+
+it('scopes provider removals to the synced item', async () => {
+  const repository = createRepository()
+  const removalGateway: PlaidGateway = {
+    async syncTransactions() {
+      return { added: [], modified: [], removed: [{ transactionId: 'transaction-1' }], nextCursor: 'cursor-1', hasMore: false }
+    },
+  }
+
+  await syncOwnedItem({ userId: 'user-a', itemId: 'item-a', gateway: removalGateway, repository })
+
+  expect(repository.removals).toEqual([{ userId: 'user-a', itemId: 'item-a', externalIds: ['transaction-1'] }])
 })
