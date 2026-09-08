@@ -5,6 +5,9 @@ import type { PlaidGateway } from '@/features/plaid/sync-owned-item'
 
 export function createPlaidGateway(client: PlaidApi): PlaidGateway {
   return {
+    async removeItem({ accessToken }) {
+      await client.itemRemove({ access_token: accessToken })
+    },
     async syncTransactions({ accessToken, cursor }) {
       const { data } = await client.transactionsSync({
         access_token: accessToken,

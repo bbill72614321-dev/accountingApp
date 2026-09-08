@@ -2,9 +2,10 @@ import 'server-only'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { decryptAccessToken } from '@/lib/plaid/crypto'
+import type { OwnedItemDeletionRepository } from './disconnect-owned-item'
 import type { PlaidSyncRepository } from './sync-owned-item'
 
-export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncRepository {
+export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncRepository & OwnedItemDeletionRepository {
   return {
     async findOwnedItem(userId, itemId) {
       const { data: item } = await admin.from('bank_items').select('id, cursor').eq('id', itemId).eq('user_id', userId).maybeSingle()
@@ -35,6 +36,11 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
       const { error } = await admin.from('transactions').delete()
         .eq('user_id', userId).eq('source', 'plaid').eq('bank_item_id', itemId).in('external_id', externalIds)
       if (error) throw new Error('Unable to remove Plaid transactions')
+    },
+    async deleteOwnedItem(userId, itemId) {
+      const { data, error } = await admin.from('bank_items').delete()
+        .eq('id', itemId).eq('user_id', userId).select('id').maybeSingle()
+      if (error || !data) throw new Error('Unable to delete bank connection')
     },
     async updateCursor(itemId, cursor) {
       const { error } = await admin.from('bank_items').update({ cursor, last_synced_at: new Date().toISOString(), status: 'active' }).eq('id', itemId)
