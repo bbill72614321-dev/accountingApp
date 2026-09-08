@@ -6,6 +6,10 @@ export function canDeleteTransaction(source: string) {
   return source === 'manual'
 }
 
+export function canEditTransaction(source: string) {
+  return source === 'manual'
+}
+
 export function transactionStatus(pending: boolean) {
   return pending ? 'needsReview' : 'ready'
 }

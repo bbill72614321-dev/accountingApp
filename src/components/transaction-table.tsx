@@ -11,7 +11,7 @@ import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
 import { canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
-import { canDeleteTransaction, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
+import { canDeleteTransaction, canEditTransaction, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
 export type TransactionRow = {
   id: string
@@ -85,7 +85,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                         {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
                       </button>
                     </form>
-                    <Link className="ledger-button" href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>
+                    {canEditTransaction(row.source) && <Link className="ledger-button" href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>}
                     {canDeleteTransaction(row.source) && (
                       <DeleteTransactionForm confirmation={dictionary.deleteConfirmation} label={dictionary.delete} transactionId={row.id} />
                     )}

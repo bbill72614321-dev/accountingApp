@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  canEditTransaction,
   canDeleteTransaction,
   isCurrentNavigationPath,
   isPendingFilter,
@@ -22,6 +23,11 @@ describe('UI state helpers', () => {
   it('allows deletion only for manual transactions', () => {
     expect(canDeleteTransaction('manual')).toBe(true)
     expect(canDeleteTransaction('plaid')).toBe(false)
+  })
+
+  it('allows full editing only for manual transactions', () => {
+    expect(canEditTransaction('manual')).toBe(true)
+    expect(canEditTransaction('plaid')).toBe(false)
   })
 
   it('labels pending entries as needing review', () => {
