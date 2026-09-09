@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { z } from 'zod'
 import { CategoryBars } from '@/components/category-bars'
+import { MonthNavigator } from '@/components/month-navigator'
 import type { Category } from '@/features/transactions/categories'
+import { availableMonths } from '@/features/transactions/month-navigation'
 import { countPendingMonth, summarizeMonth, type SummaryTransaction } from '@/features/transactions/monthly-summary'
 import { formatUsd } from '@/features/transactions/money'
 import { getDictionary, getLanguage } from '@/lib/i18n'
@@ -19,7 +21,8 @@ export default async function DashboardPage({
   searchParams,
 }: { searchParams: Promise<{ month?: string }> }) {
   const { month: rawMonth } = await searchParams
-  const month = monthSchema.safeParse(rawMonth).data ?? new Date().toISOString().slice(0, 7)
+  const homeMonth = new Date().toISOString().slice(0, 7)
+  const month = monthSchema.safeParse(rawMonth).data ?? homeMonth
   const language = await getLanguage()
   const dictionary = getDictionary(language)
   const user = await requireUser()
@@ -29,6 +32,9 @@ export default async function DashboardPage({
   ).eq('user_id', user.id).gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
     .order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load monthly summary')
+  const { data: monthRows, error: monthError } = await supabase.from('transactions').select('transaction_date').eq('user_id', user.id)
+  if (monthError) throw new Error('Unable to load available months')
+  const months = availableMonths((monthRows ?? []).map((row) => row.transaction_date), homeMonth)
 
   const transactions: SummaryTransaction[] = (data ?? []).map((row) => ({
     date: row.transaction_date,
@@ -57,11 +63,7 @@ export default async function DashboardPage({
           <Link className="button button-primary" href="/transactions/new">+ {dictionary.newTransaction}</Link>
         </div>
       </div>
-      <form className="filters" method="get">
-        <label htmlFor="dashboard-month">{dictionary.month}</label>
-        <input defaultValue={month} id="dashboard-month" name="month" pattern="\d{4}-\d{2}" placeholder="YYYY-MM" />
-        <button className="button" type="submit">{dictionary.filters}</button>
-      </form>
+      <MonthNavigator currentMonth={month} homeMonth={homeMonth} labels={{ current: dictionary.currentMonth, month: dictionary.month, newer: dictionary.previousMonth, older: dictionary.nextMonth }} language={language} months={months} />
       <div className="console-metric-grid">
         <section className="primary-readout">
           <h2>{dictionary.spentThisMonth}</h2>

@@ -61,6 +61,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .filters { align-items: end; display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0 0 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 0.65rem; background: #10151d; }
 .filters label, .form-stack label { color: var(--muted-strong); display: grid; font-size: 0.78rem; font-weight: 650; gap: 0.35rem; }
 .filters input, .filters select { min-width: 9rem; }
+.month-navigator { align-items: center; display: flex; gap: 0.45rem; margin: 0 0 1.5rem; }
+.month-navigator select { font-weight: 700; min-width: 11.5rem; }
+.month-nav-arrow, .month-nav-current { align-items: center; background: var(--surface); border: 1px solid var(--border); color: var(--foreground); display: inline-flex; height: 2.5rem; justify-content: center; padding: 0.45rem 0.65rem; }
+.month-nav-arrow { width: 2.5rem; }
+.month-nav-current { font-size: 0.8rem; font-weight: 700; }
+.month-nav-arrow:hover, .month-nav-current:hover { background: var(--surface-strong); border-color: var(--border-strong); }
+.month-nav-arrow:disabled, .month-nav-current:disabled { cursor: default; opacity: 0.42; }
 .summary-cards { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .summary-card, .category-summary, .console-panel, .form-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 0.7rem; }
 .summary-card { padding: 1rem; }
