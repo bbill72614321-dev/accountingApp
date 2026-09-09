@@ -89,8 +89,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .activity-list strong { font-size: 0.9rem; }
 .activity-list li div span { color: var(--muted); font-size: 0.75rem; }
 .amount-outgoing, .amount-incoming { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
-.amount-outgoing { color: var(--danger); }
-.amount-incoming { color: var(--success); }
+.amount-outgoing, .ledger-table td.amount-outgoing { color: var(--danger); }
+.amount-incoming, .ledger-table td.amount-incoming { color: var(--success); }
 .ledger-summary-strip { display: grid; gap: 0.75rem; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 0.75rem; }
 .ledger-summary-strip > * { background: var(--surface); border: 1px solid var(--border); border-radius: 0.65rem; color: inherit; display: grid; gap: 0.4rem; padding: 0.85rem 1rem; text-decoration: none; }
 .ledger-summary-strip span { color: var(--muted); font-size: 0.72rem; font-weight: 750; letter-spacing: 0.08em; }
