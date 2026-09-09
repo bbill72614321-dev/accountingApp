@@ -7,9 +7,10 @@ const tx = (overrides: Partial<SummaryTransaction>): SummaryTransaction => ({
 })
 
 describe('summarizeMonth', () => {
-  it('includes only confirmed, posted USD transactions in reports', () => {
+  it('includes only explicitly included, posted USD transactions in reports', () => {
     expect(isReportEligible({ includeInReport: true, providerPending: false, reviewStatus: 'confirmed', currency: 'USD' })).toBe(true)
-    expect(isReportEligible({ includeInReport: true, providerPending: false, reviewStatus: 'needs_review', currency: 'USD' })).toBe(false)
+    expect(isReportEligible({ includeInReport: true, providerPending: false, reviewStatus: 'needs_review', currency: 'USD' })).toBe(true)
+    expect(isReportEligible({ includeInReport: false, providerPending: false, reviewStatus: 'confirmed', currency: 'USD' })).toBe(false)
     expect(isReportEligible({ includeInReport: true, providerPending: true, reviewStatus: 'confirmed', currency: 'USD' })).toBe(false)
   })
 

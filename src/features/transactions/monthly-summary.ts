@@ -21,7 +21,6 @@ export type ReportEligibility = {
 export function isReportEligible(transaction: ReportEligibility) {
   return transaction.includeInReport
     && !transaction.providerPending
-    && transaction.reviewStatus === 'confirmed'
     && transaction.currency === 'USD'
 }
 

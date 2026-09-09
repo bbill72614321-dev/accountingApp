@@ -73,7 +73,7 @@ export default async function DashboardPage({
           <p data-testid="net-amount">{formatUsd(summary.netAmountCents, language)}</p>
         </section>
         <Link className="support-readout review-readout" href={`/transactions?month=${month}&review=pending`}>
-          <h2>{dictionary.needsReview}</h2>
+          <h2>{dictionary.bankPending}</h2>
           <p>{pendingCount}</p>
           <span>{dictionary.transactions}</span>
         </Link>

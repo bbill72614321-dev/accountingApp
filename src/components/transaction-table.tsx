@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import {
-  confirmImportedTransaction,
   setTransactionIncluded,
   updateTransactionCategory,
   updateTransactionNote,
@@ -9,7 +8,7 @@ import { DeleteTransactionForm } from '@/components/delete-transaction-form'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
-import { canConfirmImportedTransaction, canUseIncomeCategory } from '@/features/transactions/validation'
+import { canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
 import { canDeleteTransaction, canEditTransaction, transactionCategoryFieldKey, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
@@ -33,14 +32,13 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
     <div className="ledger-table-wrap">
       <table className="ledger-table">
         <thead>
-          <tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th><th>{dictionary.needsReview}</th><th>{dictionary.edit}</th></tr>
+          <tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th><th>{dictionary.status}</th><th>{dictionary.edit}</th></tr>
         </thead>
         <tbody>
           {rows.map((row) => {
             const category = displayedCategory({
               sourceCategory: row.source_category, categoryOverride: row.category_override,
             })
-            const canConfirm = canConfirmImportedTransaction({ amountCents: row.amount_cents, category, included: row.include_in_report })
             const amount = `${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`
             return (
               <tr key={row.id}>
@@ -71,12 +69,10 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                     <button className="ledger-button" type="submit">{dictionary.save}</button>
                   </form>
                 </td>
-                <td data-label={dictionary.needsReview}>
+                <td data-label={dictionary.status}>
                   {row.source === 'plaid' && row.provider_pending
                     ? <span className="status-label is-pending">{dictionary.bankPending}</span>
-                    : row.source === 'plaid' && row.review_status === 'needs_review'
-                      ? <form action={confirmImportedTransaction} className="ledger-inline-form ledger-review-form"><input name="transaction_id" type="hidden" value={row.id} /><span className="status-label is-pending">{dictionary.needsReview}</span><button className="ledger-button" disabled={!canConfirm} type="submit">{dictionary.confirm}</button></form>
-                      : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
+                    : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
                 <td data-label={dictionary.edit}>
                   <div className="ledger-actions">

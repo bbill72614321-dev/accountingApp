@@ -36,14 +36,14 @@ export default async function TransactionsPage({
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
   if (category) query = query.or(effectiveCategoryFilter(category))
   if (search) query = query.or(`raw_description.ilike.*${search}*,note.ilike.*${search}*`)
-  if (review) query = query.eq('review_status', 'needs_review').eq('provider_pending', false)
+  if (review) query = query.eq('provider_pending', true)
 
   const { data, error } = await query
   if (error) throw new Error('Unable to load transactions')
   const rows = (data ?? []) as TransactionRow[]
   const outgoingCents = rows.reduce((total, row) => total + Math.max(0, -row.amount_cents), 0)
   const netCents = rows.reduce((total, row) => total + row.amount_cents, 0)
-  const pendingCount = rows.filter((row) => row.source === 'plaid' ? row.review_status === 'needs_review' && !row.provider_pending : row.pending).length
+  const pendingCount = rows.filter((row) => row.source === 'plaid' ? row.provider_pending : row.pending).length
   const hasFilters = hasTransactionFilters({ month, category, q: search, review })
 
   return (
@@ -66,10 +66,10 @@ export default async function TransactionsPage({
         </select>
         <label htmlFor="q">{dictionary.search}</label>
         <input defaultValue={search} id="q" name="q" />
-        <label htmlFor="review">{dictionary.needsReview}</label>
+        <label htmlFor="review">{dictionary.bankPending}</label>
         <select defaultValue={review ?? ''} id="review" name="review">
           <option value="">—</option>
-          <option value="pending">{dictionary.needsReview}</option>
+          <option value="pending">{dictionary.bankPending}</option>
         </select>
         <button className="button" type="submit">{dictionary.filters}</button>
         {hasFilters && <Link className="button" href="/transactions">{dictionary.clearFilters}</Link>}
@@ -77,7 +77,7 @@ export default async function TransactionsPage({
       <div className="ledger-summary-strip">
         <div><span>{dictionary.totalSpending}</span><strong>{formatUsd(outgoingCents, language)}</strong></div>
         <div><span>{dictionary.netAmount}</span><strong>{formatUsd(netCents, language)}</strong></div>
-        <Link href={`/transactions${month ? `?month=${month}&review=pending` : '?review=pending'}`}><span>{dictionary.needsReview}</span><strong>{pendingCount}</strong></Link>
+        <Link href={`/transactions${month ? `?month=${month}&review=pending` : '?review=pending'}`}><span>{dictionary.bankPending}</span><strong>{pendingCount}</strong></Link>
       </div>
       {rows.length === 0 ? <p className="ledger-empty">{hasFilters ? dictionary.noFilteredTransactions : dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={rows} />}
     </section>
