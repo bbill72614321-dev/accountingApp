@@ -5,7 +5,6 @@ import { TransactionTable, type TransactionRow } from '@/components/transaction-
 import { CATEGORIES, CATEGORY_LABELS } from '@/features/transactions/categories'
 import { effectiveCategoryFilter } from '@/features/transactions/merchant-rule'
 import { availableMonths } from '@/features/transactions/month-navigation'
-import { formatUsd } from '@/features/transactions/money'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { getDictionary, getLanguage } from '@/lib/i18n'
@@ -42,8 +41,6 @@ export default async function TransactionsPage({
   if (monthError) throw new Error('Unable to load available months')
   const months = availableMonths((monthRows ?? []).map((row) => row.transaction_date), homeMonth)
   const rows = (data ?? []) as TransactionRow[]
-  const outgoingCents = rows.reduce((total, row) => total + Math.max(0, -row.amount_cents), 0)
-  const netCents = rows.reduce((total, row) => total + row.amount_cents, 0)
   const hasFilters = hasTransactionFilters({ month, category })
 
   return (
@@ -70,10 +67,6 @@ export default async function TransactionsPage({
         <button className="button" type="submit">{dictionary.filters}</button>
         {hasFilters && <Link className="button" href="/transactions">{dictionary.clearFilters}</Link>}
         </form>
-      </div>
-      <div className="ledger-summary-strip">
-        <div><span>{dictionary.totalSpending}</span><strong>{formatUsd(outgoingCents, language)}</strong></div>
-        <div><span>{dictionary.netAmount}</span><strong>{formatUsd(netCents, language)}</strong></div>
       </div>
       {rows.length === 0 ? <p className="ledger-empty">{hasFilters ? dictionary.noFilteredTransactions : dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={rows} />}
     </section>
