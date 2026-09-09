@@ -7,6 +7,7 @@ import {
   hasTransactionFilters,
   transactionSourceLabel,
   transactionStatus,
+  transactionCategoryFieldKey,
 } from './ui-state'
 
 describe('UI state helpers', () => {
@@ -28,6 +29,10 @@ describe('UI state helpers', () => {
   it('allows full editing only for manual transactions', () => {
     expect(canEditTransaction('manual')).toBe(true)
     expect(canEditTransaction('plaid')).toBe(false)
+  })
+
+  it('changes a category field key after its saved category changes', () => {
+    expect(transactionCategoryFieldKey('transaction-1', null)).not.toBe(transactionCategoryFieldKey('transaction-1', 'Grocery'))
   })
 
   it('labels pending entries as needing review', () => {

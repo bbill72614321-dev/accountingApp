@@ -11,7 +11,7 @@ import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
 import { canConfirmImportedTransaction, canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
-import { canDeleteTransaction, canEditTransaction, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
+import { canDeleteTransaction, canEditTransaction, transactionCategoryFieldKey, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
 export type TransactionRow = {
   id: string
@@ -52,7 +52,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   <form action={updateTransactionCategory} className="ledger-inline-form">
                     <input name="transaction_id" type="hidden" value={row.id} />
                     <label className="sr-only" htmlFor={`category-${row.id}`}>{dictionary.category}</label>
-                    <select defaultValue={category ?? ''} id={`category-${row.id}`} name="category">
+                    <select defaultValue={category ?? ''} id={`category-${row.id}`} key={transactionCategoryFieldKey(row.id, category)} name="category">
                       {canUseIncomeCategory(row.amount_cents)
                         ? <option value="">{dictionary.noSpendingCategory}</option>
                         : <option disabled value="">{dictionary.chooseCategory}</option>}

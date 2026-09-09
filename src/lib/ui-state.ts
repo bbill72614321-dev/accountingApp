@@ -10,6 +10,10 @@ export function canEditTransaction(source: string) {
   return source === 'manual'
 }
 
+export function transactionCategoryFieldKey(transactionId: string, category: string | null) {
+  return `${transactionId}:${category ?? 'uncategorized'}`
+}
+
 export function transactionStatus(pending: boolean) {
   return pending ? 'needsReview' : 'ready'
 }
