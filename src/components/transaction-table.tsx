@@ -9,6 +9,7 @@ import { SplitPaymentDialog } from '@/components/split-payment-dialog'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
+import { shouldTrackReimbursement } from '@/features/transactions/split-payment'
 import { canIncludeTransaction, canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
 import { canDeleteTransaction, canEditTransaction, transactionCategoryFieldKey, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
@@ -57,7 +58,9 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   <strong>{row.raw_description || '—'}</strong>
                   <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
                   {row.bank_account && <span className="transaction-account-label">{row.bank_account.name}{row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}</span>}
-                  {row.transaction_split && <span className="split-summary">{dictionary.yourShare}: {formatUsd(row.transaction_split.personal_amount_cents, language)}</span>}
+                  {row.transaction_split && shouldTrackReimbursement(Math.abs(row.amount_cents), row.transaction_split.personal_amount_cents) && (
+                    <span className="split-summary">{dictionary.yourShare}: {formatUsd(row.transaction_split.personal_amount_cents, language)}</span>
+                  )}
                 </td>
                 <td data-label={dictionary.category}>
                   <form action={updateTransactionCategory} className="ledger-inline-form">
