@@ -41,7 +41,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             })
             const amount = `${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`
             return (
-              <tr key={row.id}>
+              <tr className={row.include_in_report ? 'ledger-row-included' : undefined} key={row.id}>
                 <td className="ledger-merchant" data-label={dictionary.merchant}>
                   <strong>{row.raw_description || '—'}</strong>
                   <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>

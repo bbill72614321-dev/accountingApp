@@ -114,6 +114,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .ledger-table { border-collapse: collapse; min-width: 70rem; width: 100%; }
 .ledger-table th { border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.09em; padding: 0.85rem 0.75rem; text-align: left; white-space: nowrap; }
 .ledger-table td { border-bottom: 1px solid var(--border); color: var(--muted-strong); font-size: 0.84rem; padding: 0.85rem 0.75rem; vertical-align: middle; }
+.ledger-table tbody tr.ledger-row-included { opacity: 0.58; }
+.ledger-table tbody tr.ledger-row-included:hover { opacity: 0.8; }
 .ledger-table tbody tr:last-child td { border-bottom: 0; }
 .ledger-merchant { min-width: 10rem; }
 .ledger-merchant strong { color: var(--foreground); display: block; font-size: 0.9rem; }
