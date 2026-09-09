@@ -9,7 +9,7 @@ import { DeleteTransactionForm } from '@/components/delete-transaction-form'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
-import { canUseIncomeCategory } from '@/features/transactions/validation'
+import { canConfirmImportedTransaction, canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
 import { canDeleteTransaction, canEditTransaction, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
@@ -40,6 +40,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             const category = displayedCategory({
               sourceCategory: row.source_category, categoryOverride: row.category_override,
             })
+            const canConfirm = canConfirmImportedTransaction({ amountCents: row.amount_cents, category, included: row.include_in_report })
             const amount = `${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`
             return (
               <tr key={row.id}>
@@ -74,7 +75,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   {row.source === 'plaid' && row.provider_pending
                     ? <span className="status-label is-pending">{dictionary.bankPending}</span>
                     : row.source === 'plaid' && row.review_status === 'needs_review'
-                      ? <form action={confirmImportedTransaction} className="ledger-inline-form ledger-review-form"><input name="transaction_id" type="hidden" value={row.id} /><span className="status-label is-pending">{dictionary.needsReview}</span><button className="ledger-button" type="submit">{dictionary.confirm}</button></form>
+                      ? <form action={confirmImportedTransaction} className="ledger-inline-form ledger-review-form"><input name="transaction_id" type="hidden" value={row.id} /><span className="status-label is-pending">{dictionary.needsReview}</span><button className="ledger-button" disabled={!canConfirm} type="submit">{dictionary.confirm}</button></form>
                       : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
                 <td data-label={dictionary.edit}>

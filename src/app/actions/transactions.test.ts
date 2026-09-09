@@ -54,16 +54,38 @@ describe('updateManualTransaction', () => {
 })
 
 describe('confirmImportedTransaction', () => {
+  it('rejects confirming an included imported expense without a category', async () => {
+    const maybeSingle = vi.fn(async () => ({
+      data: { amount_cents: -1200, source_category: null, category_override: null, include_in_report: true },
+      error: null,
+    }))
+    const bySource = vi.fn(() => ({ maybeSingle }))
+    const byUser = vi.fn(() => ({ eq: bySource }))
+    const byId = vi.fn(() => ({ eq: byUser }))
+    const select = vi.fn(() => ({ eq: byId }))
+    const updateMaybeSingle = vi.fn(async () => ({ data: { id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd' }, error: null }))
+    const updateSelect = vi.fn(() => ({ maybeSingle: updateMaybeSingle }))
+    const updateReviewStatus = vi.fn(() => ({ select: updateSelect }))
+    const updateProviderPending = vi.fn(() => ({ eq: updateReviewStatus }))
+    const updateSource = vi.fn(() => ({ eq: updateProviderPending }))
+    const updateUser = vi.fn(() => ({ eq: updateSource }))
+    const updateId = vi.fn(() => ({ eq: updateUser }))
+    const update = vi.fn(() => ({ eq: updateId }))
+    const from = vi.fn(() => ({ select, update }))
+    createServerClient.mockResolvedValue({ from })
+    const formData = new FormData()
+    formData.set('transaction_id', 'dddddddd-dddd-4ddd-8ddd-dddddddddddd')
+
+    await expect(confirmImportedTransaction(formData)).rejects.toThrow('Unable to confirm transaction')
+    expect(update).not.toHaveBeenCalled()
+  })
+
   it('rejects confirming another user\'s imported transaction', async () => {
     const maybeSingle = vi.fn(async () => ({ data: null, error: null }))
-    const select = vi.fn(() => ({ maybeSingle }))
-    const reviewStatus = vi.fn(() => ({ select }))
-    const providerPending = vi.fn(() => ({ eq: reviewStatus }))
-    const source = vi.fn(() => ({ eq: providerPending }))
+    const source = vi.fn(() => ({ maybeSingle }))
     const user = vi.fn(() => ({ eq: source }))
     const id = vi.fn(() => ({ eq: user }))
-    const update = vi.fn(() => ({ eq: id }))
-    const from = vi.fn(() => ({ update }))
+    const from = vi.fn(() => ({ select: vi.fn(() => ({ eq: id })) }))
     createServerClient.mockResolvedValue({ from })
     const formData = new FormData()
     formData.set('transaction_id', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')

@@ -1,9 +1,17 @@
 import { z } from 'zod'
-import { CATEGORIES } from './categories'
+import { CATEGORIES, type Category } from './categories'
 import { parseUsdToCents } from './money'
 
 export function canUseIncomeCategory(amountCents: number) {
   return amountCents >= 0
+}
+
+export function canConfirmImportedTransaction(input: {
+  amountCents: number
+  category: Category | null
+  included: boolean
+}) {
+  return !input.included || canUseIncomeCategory(input.amountCents) || input.category !== null
 }
 
 export const loginSchema = z.object({

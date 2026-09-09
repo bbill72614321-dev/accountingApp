@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { CATEGORIES } from '@/features/transactions/categories'
 import { normalizeMerchant } from '@/features/transactions/merchant'
-import { canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
+import { displayedCategory } from '@/features/transactions/merchant-rule'
+import { canConfirmImportedTransaction, canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
 
@@ -159,6 +160,15 @@ export async function confirmImportedTransaction(formData: FormData): Promise<vo
   if (!id.success) throw new Error('Invalid transaction')
 
   const supabase = await createServerClient()
+  const { data: transaction, error: transactionError } = await supabase.from('transactions')
+    .select('amount_cents, source_category, category_override, include_in_report')
+    .eq('id', id.data).eq('user_id', user.id).eq('source', 'plaid').maybeSingle()
+  if (transactionError || !transaction || !canConfirmImportedTransaction({
+    amountCents: transaction.amount_cents,
+    category: displayedCategory({ sourceCategory: transaction.source_category, categoryOverride: transaction.category_override }),
+    included: transaction.include_in_report,
+  })) throw new Error('Unable to confirm transaction')
+
   const { data, error } = await supabase.from('transactions').update({
     review_status: 'confirmed',
     reviewed_at: new Date().toISOString(),
