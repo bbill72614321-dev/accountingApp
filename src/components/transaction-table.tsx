@@ -56,7 +56,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             const canInclude = canIncludeTransaction({ amountCents: row.amount_cents, category })
             const reportDisposition = transactionReportDisposition({ included: row.include_in_report, excluded: row.excluded_from_report })
             return (
-              <tr className={reportDisposition === 'excluded' ? 'ledger-row-excluded' : undefined} key={row.id}>
+              <tr className={reportDisposition === 'pending' ? undefined : 'ledger-row-resolved'} key={row.id}>
                 <td className="ledger-merchant" data-label={dictionary.merchant}>
                   <strong>{row.raw_description || '—'}</strong>
                   <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
