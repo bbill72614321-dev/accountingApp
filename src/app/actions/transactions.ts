@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { CATEGORIES } from '@/features/transactions/categories'
 import { normalizeMerchant } from '@/features/transactions/merchant'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
-import { canSaveSplitPayment } from '@/features/transactions/split-payment'
+import { canSaveSplitPayment, shouldTrackReimbursement } from '@/features/transactions/split-payment'
 import { canConfirmImportedTransaction, canIncludeTransaction, canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -190,6 +190,14 @@ export async function saveTransactionSplit(formData: FormData): Promise<ActionSt
     splitCount: parsed.data.splitCount,
     personalAmountCents,
   })) return { status: 'error', message: 'invalidSplit' }
+
+  if (!shouldTrackReimbursement(Math.abs(transaction.amount_cents), personalAmountCents)) {
+    const { error } = await supabase.from('transaction_splits').delete()
+      .eq('transaction_id', parsed.data.transactionId).eq('user_id', user.id)
+    if (error) return { status: 'error', message: 'saveSplitFailed' }
+    revalidateLedger()
+    return { status: 'success', message: '' }
+  }
 
   const { error } = await supabase.from('transaction_splits').upsert({
     user_id: user.id,

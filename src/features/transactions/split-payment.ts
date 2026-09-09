@@ -6,6 +6,10 @@ export function owedAmountCents(totalAmountCents: number, personalAmountCents: n
   return totalAmountCents - personalAmountCents
 }
 
+export function shouldTrackReimbursement(totalAmountCents: number, personalAmountCents: number) {
+  return owedAmountCents(totalAmountCents, personalAmountCents) > 0
+}
+
 export function effectiveReportAmountCents(amountCents: number, personalAmountCents: number | null) {
   return personalAmountCents === null ? amountCents : -personalAmountCents
 }

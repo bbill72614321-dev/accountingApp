@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canSaveSplitPayment, defaultPersonalShareCents, effectiveReportAmountCents, owedAmountCents } from './split-payment'
+import { canSaveSplitPayment, defaultPersonalShareCents, effectiveReportAmountCents, owedAmountCents, shouldTrackReimbursement } from './split-payment'
 
 describe('split payments', () => {
   it('defaults the personal share to an equal portion of an outgoing transaction', () => {
@@ -22,5 +22,10 @@ describe('split payments', () => {
     expect(canSaveSplitPayment({ amountCents: -12_000, splitCount: 2, personalAmountCents: 6_000 })).toBe(true)
     expect(canSaveSplitPayment({ amountCents: 12_000, splitCount: 2, personalAmountCents: 6_000 })).toBe(false)
     expect(canSaveSplitPayment({ amountCents: -12_000, splitCount: 2, personalAmountCents: 12_001 })).toBe(false)
+  })
+
+  it('does not keep a reimbursement when the personal share becomes the full charge', () => {
+    expect(shouldTrackReimbursement(12_000, 12_000)).toBe(false)
+    expect(shouldTrackReimbursement(12_000, 11_999)).toBe(true)
   })
 })
