@@ -13,15 +13,23 @@ function ArrowIcon({ direction }: { direction: 'left' | 'right' }) {
   return <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><path d={direction === 'left' ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'} /></svg>
 }
 
-export function MonthNavigator({ currentMonth, homeMonth, language, months, labels }: {
+export function MonthNavigator({ currentMonth, homeMonth, language, months, labels, path, query }: {
   currentMonth: string
   homeMonth: string
   language: Language
   months: string[]
   labels: { current: string; month: string; newer: string; older: string }
+  path?: string
+  query?: Record<string, string | undefined>
 }) {
   const router = useRouter()
-  const navigate = (month: string) => router.push(month === homeMonth ? '/dashboard' : `/dashboard?month=${month}`)
+  const navigate = (month: string) => {
+    const params = new URLSearchParams(Object.entries(query ?? {}).filter((entry): entry is [string, string] => Boolean(entry[1])))
+    if (month === homeMonth) params.delete('month')
+    else params.set('month', month)
+    const destination = path ?? '/dashboard'
+    router.push(params.size > 0 ? `${destination}?${params}` : destination)
+  }
   const newer = adjacentMonth(months, currentMonth, 'newer')
   const older = adjacentMonth(months, currentMonth, 'older')
 
