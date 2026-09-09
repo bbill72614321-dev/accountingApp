@@ -115,7 +115,6 @@ export default async function DashboardPage({
           </ul>
         )}
       </section>
-      <p className="muted">{dictionary.syncLater}</p>
     </div>
   )
 }
