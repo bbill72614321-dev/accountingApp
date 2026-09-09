@@ -8,7 +8,7 @@ import { DeleteTransactionForm } from '@/components/delete-transaction-form'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
-import { canUseIncomeCategory } from '@/features/transactions/validation'
+import { canIncludeTransaction, canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
 import { canDeleteTransaction, canEditTransaction, transactionCategoryFieldKey, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
@@ -40,6 +40,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
               sourceCategory: row.source_category, categoryOverride: row.category_override,
             })
             const amount = `${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`
+            const canInclude = canIncludeTransaction({ amountCents: row.amount_cents, category })
             return (
               <tr className={row.include_in_report ? 'ledger-row-included' : undefined} key={row.id}>
                 <td className="ledger-merchant" data-label={dictionary.merchant}>
@@ -78,7 +79,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   <div className="ledger-actions">
                     <form action={setTransactionIncluded}>
                       <input name="transaction_id" type="hidden" value={row.id} />
-                      <button className="ledger-button ledger-report-toggle" name="included" type="submit" value={String(!row.include_in_report)}>
+                      <button className="ledger-button ledger-report-toggle" disabled={!row.include_in_report && !canInclude} name="included" type="submit" value={String(!row.include_in_report)}>
                         {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
                       </button>
                     </form>

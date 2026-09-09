@@ -14,6 +14,10 @@ export function canConfirmImportedTransaction(input: {
   return !input.included || canUseIncomeCategory(input.amountCents) || input.category !== null
 }
 
+export function canIncludeTransaction(input: { amountCents: number; category: Category | null }) {
+  return canUseIncomeCategory(input.amountCents) || input.category !== null
+}
+
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8).max(128),

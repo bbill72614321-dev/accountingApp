@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   canConfirmImportedTransaction,
+  canIncludeTransaction,
   canUseIncomeCategory,
   loginSchema,
   manualTransactionSchema,
@@ -20,6 +21,12 @@ describe('form validation', () => {
     expect(canConfirmImportedTransaction({ amountCents: -1200, category: 'Grocery', included: true })).toBe(true)
     expect(canConfirmImportedTransaction({ amountCents: 1200, category: null, included: true })).toBe(true)
     expect(canConfirmImportedTransaction({ amountCents: -1200, category: null, included: false })).toBe(true)
+  })
+
+  it('requires a category before including an expense in the monthly report', () => {
+    expect(canIncludeTransaction({ amountCents: -1200, category: null })).toBe(false)
+    expect(canIncludeTransaction({ amountCents: -1200, category: 'Grocery' })).toBe(true)
+    expect(canIncludeTransaction({ amountCents: 1200, category: null })).toBe(true)
   })
 
   it('normalizes a valid login', () => {

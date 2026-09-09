@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { CATEGORIES } from '@/features/transactions/categories'
 import { normalizeMerchant } from '@/features/transactions/merchant'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
-import { canConfirmImportedTransaction, canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
+import { canConfirmImportedTransaction, canIncludeTransaction, canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
 
@@ -147,6 +147,15 @@ export async function setTransactionIncluded(formData: FormData): Promise<void> 
   if (!parsed.success) throw new Error('Invalid inclusion setting')
 
   const supabase = await createServerClient()
+  if (parsed.data.included === 'true') {
+    const { data: transaction, error: transactionError } = await supabase.from('transactions')
+      .select('amount_cents, source_category, category_override')
+      .eq('id', parsed.data.transactionId).eq('user_id', user.id).maybeSingle()
+    if (transactionError || !transaction || !canIncludeTransaction({
+      amountCents: transaction.amount_cents,
+      category: displayedCategory({ sourceCategory: transaction.source_category, categoryOverride: transaction.category_override }),
+    })) throw new Error('Unable to include transaction')
+  }
   const { data, error } = await supabase.from('transactions').update({
     include_in_report: parsed.data.included === 'true',
   }).eq('id', parsed.data.transactionId).eq('user_id', user.id).select('id').maybeSingle()
