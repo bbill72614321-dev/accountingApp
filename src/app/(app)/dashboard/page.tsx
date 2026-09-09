@@ -4,7 +4,7 @@ import { CategoryBars } from '@/components/category-bars'
 import { MonthNavigator } from '@/components/month-navigator'
 import type { Category } from '@/features/transactions/categories'
 import { availableMonths } from '@/features/transactions/month-navigation'
-import { countPendingMonth, summarizeMonth, type SummaryTransaction } from '@/features/transactions/monthly-summary'
+import { countPendingMonth, isReportEligible, summarizeMonth, type SummaryTransaction } from '@/features/transactions/monthly-summary'
 import { formatUsd } from '@/features/transactions/money'
 import { getDictionary, getLanguage } from '@/lib/i18n'
 import { requireUser } from '@/lib/auth'
@@ -47,7 +47,12 @@ export default async function DashboardPage({
   }))
   const summary = summarizeMonth(transactions, month as `${number}-${string}`)
   const pendingCount = countPendingMonth(transactions, month as `${number}-${string}`)
-  const recentRows = (data ?? []).slice(0, 5)
+  const recentRows = (data ?? []).filter((row) => isReportEligible({
+    includeInReport: row.include_in_report,
+    providerPending: row.provider_pending,
+    reviewStatus: row.review_status,
+    currency: 'USD',
+  })).slice(0, 5)
 
   return (
     <div className="console-page dashboard-page">
