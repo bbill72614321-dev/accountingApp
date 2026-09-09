@@ -18,7 +18,7 @@ export function MonthNavigator({ currentMonth, homeMonth, language, months, labe
   homeMonth: string
   language: Language
   months: string[]
-  labels: { current: string; month: string; newer: string; older: string }
+  labels: { current: string; month: string; previous: string; next: string }
   path?: string
   query?: Record<string, string | undefined>
 }) {
@@ -34,11 +34,11 @@ export function MonthNavigator({ currentMonth, homeMonth, language, months, labe
   const older = adjacentMonth(months, currentMonth, 'older')
 
   return <nav aria-label={labels.month} className="month-navigator">
-    <button aria-label={labels.newer} className="month-nav-arrow" disabled={!newer} onClick={() => newer && navigate(newer)} type="button"><ArrowIcon direction="left" /></button>
+    <button aria-label={labels.previous} className="month-nav-arrow" disabled={!older} onClick={() => older && navigate(older)} type="button"><ArrowIcon direction="left" /></button>
     <select aria-label={labels.month} onChange={(event) => navigate(event.target.value)} value={currentMonth}>
       {months.map((month) => <option key={month} value={month}>{monthLabel(month, language)}</option>)}
     </select>
-    <button aria-label={labels.older} className="month-nav-arrow" disabled={!older} onClick={() => older && navigate(older)} type="button"><ArrowIcon direction="right" /></button>
+    <button aria-label={labels.next} className="month-nav-arrow" disabled={!newer} onClick={() => newer && navigate(newer)} type="button"><ArrowIcon direction="right" /></button>
     <button className="month-nav-current" disabled={currentMonth === homeMonth} onClick={() => navigate(homeMonth)} type="button">{labels.current}</button>
   </nav>
 }

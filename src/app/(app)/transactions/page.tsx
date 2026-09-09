@@ -57,14 +57,16 @@ export default async function TransactionsPage({
         <Link className="button button-primary" href="/transactions/new">+ {dictionary.newTransaction}</Link>
       </div>
       <div className="transaction-filter-row">
-        <MonthNavigator currentMonth={month ?? homeMonth} homeMonth={homeMonth} labels={{ current: dictionary.currentMonth, month: dictionary.month, newer: dictionary.previousMonth, older: dictionary.nextMonth }} language={language} months={months} path="/transactions" query={category ? { category } : {}} />
+        <MonthNavigator currentMonth={month ?? homeMonth} homeMonth={homeMonth} labels={{ current: dictionary.currentMonth, month: dictionary.month, previous: dictionary.previousMonth, next: dictionary.nextMonth }} language={language} months={months} path="/transactions" query={category ? { category } : {}} />
         <form className="category-filter" method="get">
           {month && <input name="month" type="hidden" value={month} />}
-        <label htmlFor="filter-category">{dictionary.category}</label>
-        <select defaultValue={category ?? ''} id="filter-category" name="category">
-          <option value="">—</option>
-          {CATEGORIES.map((item) => <option key={item} value={item}>{CATEGORY_LABELS[item][language]}</option>)}
-        </select>
+          <div className="category-filter-field">
+            <label htmlFor="filter-category">{dictionary.category}</label>
+            <select defaultValue={category ?? ''} id="filter-category" name="category">
+              <option value="">—</option>
+              {CATEGORIES.map((item) => <option key={item} value={item}>{CATEGORY_LABELS[item][language]}</option>)}
+            </select>
+          </div>
         <button className="button" type="submit">{dictionary.filters}</button>
         {hasFilters && <Link className="button" href="/transactions">{dictionary.clearFilters}</Link>}
         </form>

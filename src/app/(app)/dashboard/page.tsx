@@ -68,7 +68,7 @@ export default async function DashboardPage({
           <Link className="button button-primary" href="/transactions/new">+ {dictionary.newTransaction}</Link>
         </div>
       </div>
-      <MonthNavigator currentMonth={month} homeMonth={homeMonth} labels={{ current: dictionary.currentMonth, month: dictionary.month, newer: dictionary.previousMonth, older: dictionary.nextMonth }} language={language} months={months} />
+      <MonthNavigator currentMonth={month} homeMonth={homeMonth} labels={{ current: dictionary.currentMonth, month: dictionary.month, previous: dictionary.previousMonth, next: dictionary.nextMonth }} language={language} months={months} />
       <div className="console-metric-grid">
         <section className="primary-readout">
           <h2>{dictionary.spentThisMonth}</h2>
