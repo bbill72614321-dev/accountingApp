@@ -120,6 +120,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .ledger-merchant { min-width: 10rem; }
 .ledger-merchant strong { color: var(--foreground); display: block; font-size: 0.9rem; }
 .source-label, .status-label { border: 1px solid var(--border-strong); border-radius: 99px; color: var(--muted); display: inline-block; font-size: 0.65rem; font-weight: 700; margin-top: 0.35rem; padding: 0.18rem 0.42rem; white-space: nowrap; }
+.transaction-account-label { color: var(--muted); display: block; font-size: 0.72rem; margin-top: 0.35rem; }
 .status-label.is-pending { border-color: #69562b; color: var(--review); }
 .ledger-inline-form { align-items: center; display: flex; gap: 0.5rem; min-width: 11rem; }
 .ledger-inline-form select, .ledger-inline-form input { height: 2.25rem; min-width: 0; padding: 0.4rem 0.55rem; width: 100%; }

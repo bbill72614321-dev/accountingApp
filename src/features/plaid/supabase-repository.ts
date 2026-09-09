@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { decryptAccessToken } from '@/lib/plaid/crypto'
 import type { OwnedItemDeletionRepository } from './disconnect-owned-item'
 import type { PlaidSyncRepository } from './sync-owned-item'
+import { requireLinkedBankAccountId } from './transaction-account-mapping'
 
 export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncRepository & OwnedItemDeletionRepository {
   return {
@@ -20,9 +21,18 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
     async upsertAccounts() {},
     async upsertTransactions(rows) {
       if (rows.length === 0) return
+      const firstRow = rows[0]
+      const plaidAccountIds = [...new Set(rows.map((row) => row.providerAccountId))]
+      const { data: accounts, error: accountsError } = await admin.from('bank_accounts')
+        .select('id, plaid_account_id')
+        .eq('user_id', firstRow.userId)
+        .eq('bank_item_id', firstRow.itemId)
+        .in('plaid_account_id', plaidAccountIds)
+      if (accountsError) throw new Error('Unable to load linked bank accounts')
+      const localAccountIdByPlaidAccountId = new Map((accounts ?? []).map((account) => [account.plaid_account_id, account.id]))
       const records = rows.map((row) => ({
         user_id: row.userId, source: 'plaid', external_id: row.externalId,
-        bank_item_id: row.itemId,
+        bank_item_id: row.itemId, bank_account_id: requireLinkedBankAccountId(localAccountIdByPlaidAccountId, row.providerAccountId),
         raw_description: row.rawDescription, normalized_merchant: row.normalizedMerchant,
         transaction_date: row.transactionDate, amount_cents: row.amountCents,
         pending: row.providerPending, provider_pending: row.providerPending,

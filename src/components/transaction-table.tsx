@@ -25,6 +25,10 @@ export type TransactionRow = {
   pending: boolean
   provider_pending?: boolean
   review_status?: 'confirmed' | 'needs_review'
+  bank_account?: {
+    name: string
+    mask: string | null
+  } | null
 }
 
 export function TransactionTable({ rows, language = 'en', dictionary }: { rows: TransactionRow[]; language?: Language; dictionary: Dictionary }) {
@@ -46,6 +50,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                 <td className="ledger-merchant" data-label={dictionary.merchant}>
                   <strong>{row.raw_description || '—'}</strong>
                   <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
+                  {row.bank_account && <span className="transaction-account-label">{row.bank_account.name}{row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}</span>}
                 </td>
                 <td data-label={dictionary.category}>
                   <form action={updateTransactionCategory} className="ledger-inline-form">
