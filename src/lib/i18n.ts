@@ -24,6 +24,7 @@ export type Dictionary = {
   disconnectBank: string; disconnectBankConfirmation: string; disconnectBankError: string
   reimbursements: string; split: string; splitPayment: string; splitCount: string; yourShare: string; amountOwed: string
   requestSent: string; markRequested: string; noReimbursements: string; totalCharged: string; invalidSplit: string; saveSplitFailed: string; cancel: string; people: string
+  skipFromReport: string; undoSkip: string; skipped: string
 }
 
 export const dictionaries: Record<Language, Dictionary> = {
@@ -54,6 +55,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     reimbursements: 'Reimbursements', split: 'Split', splitPayment: 'Split payment', splitCount: 'People splitting', yourShare: 'Your share',
     amountOwed: 'Amount owed', requestSent: 'Requested', markRequested: 'Mark requested', noReimbursements: 'No split payments for this month.', totalCharged: 'Total charged',
     invalidSplit: 'Enter a valid personal share for this outgoing transaction.', saveSplitFailed: 'Unable to save the split payment.', cancel: 'Cancel', people: 'people',
+    skipFromReport: 'Skip', undoSkip: 'Undo skip', skipped: 'Skipped',
   },
   'zh-TW': {
     login: '登入', email: '電子郵件', password: '密碼', forgotPassword: '忘記密碼？',
@@ -82,6 +84,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     reimbursements: '代墊', split: '拆分', splitPayment: '拆分交易', splitCount: '共幾人分', yourShare: '我實際負擔',
     amountOwed: '尚待收回', requestSent: '已請款', markRequested: '標記已請款', noReimbursements: '這個月份沒有代墊交易。', totalCharged: '原交易金額',
     invalidSplit: '請為這筆支出輸入有效的個人負擔金額。', saveSplitFailed: '無法儲存拆分交易。', cancel: '取消', people: '人分',
+    skipFromReport: '略過', undoSkip: '取消略過', skipped: '已略過',
   },
 }
 

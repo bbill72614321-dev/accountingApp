@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {
+  setTransactionExcluded,
   setTransactionIncluded,
   updateTransactionCategory,
   updateTransactionNote,
@@ -12,7 +13,7 @@ import { formatUsd } from '@/features/transactions/money'
 import { shouldTrackReimbursement } from '@/features/transactions/split-payment'
 import { canIncludeTransaction, canUseIncomeCategory } from '@/features/transactions/validation'
 import type { Dictionary } from '@/lib/i18n'
-import { canDeleteTransaction, canEditTransaction, transactionCategoryFieldKey, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
+import { canDeleteTransaction, canEditTransaction, transactionCategoryFieldKey, transactionReportDisposition, transactionSourceLabel, transactionStatus } from '@/lib/ui-state'
 
 export type TransactionRow = {
   id: string
@@ -23,6 +24,7 @@ export type TransactionRow = {
   amount_cents: number
   note: string
   include_in_report: boolean
+  excluded_from_report: boolean
   source: string
   pending: boolean
   provider_pending?: boolean
@@ -52,8 +54,9 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             })
             const amount = `${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`
             const canInclude = canIncludeTransaction({ amountCents: row.amount_cents, category })
+            const reportDisposition = transactionReportDisposition({ included: row.include_in_report, excluded: row.excluded_from_report })
             return (
-              <tr className={row.include_in_report ? 'ledger-row-included' : undefined} key={row.id}>
+              <tr className={reportDisposition === 'excluded' ? 'ledger-row-excluded' : undefined} key={row.id}>
                 <td className="ledger-merchant" data-label={dictionary.merchant}>
                   <strong>{row.raw_description || '—'}</strong>
                   <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
@@ -88,16 +91,31 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                 <td data-label={dictionary.status}>
                   {row.source === 'plaid' && row.provider_pending
                     ? <span className="status-label is-pending">{dictionary.bankPending}</span>
-                    : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
+                    : reportDisposition === 'excluded'
+                      ? <span className="status-label">{dictionary.skipped}</span>
+                      : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
                 <td data-label={dictionary.edit}>
                   <div className="ledger-actions">
-                    <form action={setTransactionIncluded}>
-                      <input name="transaction_id" type="hidden" value={row.id} />
-                      <button className="ledger-button ledger-report-toggle" disabled={!row.include_in_report && !canInclude} name="included" type="submit" value={String(!row.include_in_report)}>
-                        {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
-                      </button>
-                    </form>
+                    {reportDisposition === 'excluded' ? (
+                      <form action={setTransactionExcluded}>
+                        <input name="transaction_id" type="hidden" value={row.id} />
+                        <button className="ledger-button ledger-report-toggle" name="excluded" type="submit" value="false">{dictionary.undoSkip}</button>
+                      </form>
+                    ) : (
+                      <>
+                        <form action={setTransactionIncluded}>
+                          <input name="transaction_id" type="hidden" value={row.id} />
+                          <button className="ledger-button ledger-report-toggle" disabled={!row.include_in_report && !canInclude} name="included" type="submit" value={String(!row.include_in_report)}>
+                            {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
+                          </button>
+                        </form>
+                        <form action={setTransactionExcluded}>
+                          <input name="transaction_id" type="hidden" value={row.id} />
+                          <button className="ledger-button" name="excluded" type="submit" value="true">{dictionary.skipFromReport}</button>
+                        </form>
+                      </>
+                    )}
                     {row.amount_cents < 0 && <SplitPaymentDialog amountCents={row.amount_cents} dictionary={dictionary} split={row.transaction_split} transactionId={row.id} />}
                     {canEditTransaction(row.source) && <Link className="ledger-button" href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>}
                     {canDeleteTransaction(row.source) && (

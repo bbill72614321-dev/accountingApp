@@ -8,6 +8,7 @@ import {
   transactionSourceLabel,
   transactionStatus,
   transactionCategoryFieldKey,
+  transactionReportDisposition,
 } from './ui-state'
 
 describe('UI state helpers', () => {
@@ -56,5 +57,11 @@ describe('UI state helpers', () => {
     expect(hasTransactionFilters({ month: '2026-08' })).toBe(true)
     expect(hasTransactionFilters({ category: 'Grocery', q: 'whole foods' })).toBe(true)
     expect(hasTransactionFilters({ review: 'pending' })).toBe(true)
+  })
+
+  it('keeps pending report decisions distinct from explicitly skipped transactions', () => {
+    expect(transactionReportDisposition({ included: false, excluded: false })).toBe('pending')
+    expect(transactionReportDisposition({ included: true, excluded: false })).toBe('included')
+    expect(transactionReportDisposition({ included: false, excluded: true })).toBe('excluded')
   })
 })

@@ -26,6 +26,10 @@ const inclusionSchema = z.object({
   transactionId: transactionIdSchema,
   included: z.enum(['true', 'false']),
 })
+const exclusionSchema = z.object({
+  transactionId: transactionIdSchema,
+  excluded: z.enum(['true', 'false']),
+})
 const splitSchema = z.object({
   transactionId: transactionIdSchema,
   splitCount: z.coerce.number().int().min(2).max(100),
@@ -167,8 +171,26 @@ export async function setTransactionIncluded(formData: FormData): Promise<void> 
   }
   const { data, error } = await supabase.from('transactions').update({
     include_in_report: parsed.data.included === 'true',
+    excluded_from_report: false,
   }).eq('id', parsed.data.transactionId).eq('user_id', user.id).select('id').maybeSingle()
   if (error || !data) throw new Error('Unable to update inclusion setting')
+  revalidateLedger()
+}
+
+export async function setTransactionExcluded(formData: FormData): Promise<void> {
+  const user = await requireUser()
+  const parsed = exclusionSchema.safeParse({
+    transactionId: formData.get('transaction_id'), excluded: formData.get('excluded'),
+  })
+  if (!parsed.success) throw new Error('Invalid exclusion setting')
+
+  const isExcluded = parsed.data.excluded === 'true'
+  const supabase = await createServerClient()
+  const { data, error } = await supabase.from('transactions').update({
+    include_in_report: false,
+    excluded_from_report: isExcluded,
+  }).eq('id', parsed.data.transactionId).eq('user_id', user.id).select('id').maybeSingle()
+  if (error || !data) throw new Error('Unable to update exclusion setting')
   revalidateLedger()
 }
 

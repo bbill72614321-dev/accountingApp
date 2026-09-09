@@ -26,6 +26,11 @@ export function transactionSourceLabel(source: string) {
   return source === 'manual' ? 'manual' : 'imported'
 }
 
+export function transactionReportDisposition({ included, excluded }: { included: boolean; excluded: boolean }) {
+  if (excluded) return 'excluded'
+  return included ? 'included' : 'pending'
+}
+
 export function hasTransactionFilters(filters: {
   month?: string
   category?: string
