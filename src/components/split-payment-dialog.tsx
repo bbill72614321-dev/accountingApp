@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { saveTransactionSplit, type ActionState } from '@/app/actions/transactions'
 import { defaultPersonalShareCents, owedAmountCents } from '@/features/transactions/split-payment'
 import type { Dictionary } from '@/lib/i18n'
@@ -26,6 +27,7 @@ export function SplitPaymentDialog({
   transactionId: string
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
+  const router = useRouter()
   const [splitCount, setSplitCount] = useState(split?.split_count ?? 2)
   const [personalAmount, setPersonalAmount] = useState(dollars(split?.personal_amount_cents ?? defaultPersonalShareCents(amountCents, 2)))
   const [state, setState] = useState<ActionState>({ status: 'idle', message: '' })
@@ -43,7 +45,10 @@ export function SplitPaymentDialog({
     startTransition(async () => {
       const result = await saveTransactionSplit(formData)
       setState(result)
-      if (result.status === 'success') dialog.current?.close()
+      if (result.status === 'success') {
+        dialog.current?.close()
+        router.refresh()
+      }
     })
   }
 
