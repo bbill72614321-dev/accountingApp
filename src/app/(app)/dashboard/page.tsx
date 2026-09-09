@@ -57,7 +57,7 @@ export default async function DashboardPage({
     providerPending: row.provider_pending,
     reviewStatus: row.review_status,
     currency: 'USD',
-  })).slice(0, 5)
+  }))
 
   return (
     <div className="console-page dashboard-page">
