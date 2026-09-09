@@ -49,7 +49,7 @@ export function SplitPaymentDialog({
 
   return (
     <>
-      <button className="ledger-button" onClick={() => dialog.current?.showModal()} type="button">{split ? dictionary.editSplit : dictionary.split}</button>
+      <button className="ledger-button" onClick={() => dialog.current?.showModal()} type="button">{dictionary.split}</button>
       <dialog aria-labelledby={`split-title-${transactionId}`} className="split-dialog" ref={dialog}>
         <form action={submit} className="split-form">
           <input name="transaction_id" type="hidden" value={transactionId} />
