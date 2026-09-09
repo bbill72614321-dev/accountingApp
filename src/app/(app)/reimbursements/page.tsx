@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { markSplitRequested } from '@/app/actions/transactions'
 import { MonthNavigator } from '@/components/month-navigator'
 import { availableMonths } from '@/features/transactions/month-navigation'
-import { owedAmountCents } from '@/features/transactions/split-payment'
+import { owedAmountCents, shouldTrackReimbursement } from '@/features/transactions/split-payment'
 import { formatUsd } from '@/features/transactions/money'
 import { requireUser } from '@/lib/auth'
 import { getDictionary, getLanguage } from '@/lib/i18n'
@@ -25,7 +25,9 @@ export default async function ReimbursementsPage({ searchParams }: { searchParam
   const rows = (data ?? []).map((row) => {
     const transaction = Array.isArray(row.transaction) ? row.transaction[0] : row.transaction
     return { ...row, transaction }
-  }).filter((row) => row.transaction?.transaction_date.startsWith(`${month}-`))
+  }).filter((row) => row.transaction
+    && shouldTrackReimbursement(Math.abs(row.transaction.amount_cents), row.personal_amount_cents)
+    && row.transaction.transaction_date.startsWith(`${month}-`))
   const months = availableMonths((data ?? []).flatMap((row) => {
     const transaction = Array.isArray(row.transaction) ? row.transaction[0] : row.transaction
     return transaction ? [transaction.transaction_date] : []
