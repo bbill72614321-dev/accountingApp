@@ -6,6 +6,7 @@ import type { Category } from '@/features/transactions/categories'
 import { availableMonths } from '@/features/transactions/month-navigation'
 import { countPendingMonth, isReportEligible, summarizeMonth, type SummaryTransaction } from '@/features/transactions/monthly-summary'
 import { formatUsd } from '@/features/transactions/money'
+import { effectiveReportAmountCents } from '@/features/transactions/split-payment'
 import { getDictionary, getLanguage } from '@/lib/i18n'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -28,7 +29,7 @@ export default async function DashboardPage({
   const user = await requireUser()
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
-    'raw_description, transaction_date, amount_cents, source_category, category_override, pending, provider_pending, review_status, include_in_report',
+    'raw_description, transaction_date, amount_cents, source_category, category_override, pending, provider_pending, review_status, include_in_report, transaction_split:transaction_splits(personal_amount_cents)',
   ).eq('user_id', user.id).gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
     .order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load monthly summary')
@@ -36,9 +37,13 @@ export default async function DashboardPage({
   if (monthError) throw new Error('Unable to load available months')
   const months = availableMonths((monthRows ?? []).map((row) => row.transaction_date), homeMonth)
 
-  const transactions: SummaryTransaction[] = (data ?? []).map((row) => ({
+  const reportRows = (data ?? []).map((row) => {
+    const transactionSplit = Array.isArray(row.transaction_split) ? row.transaction_split[0] : row.transaction_split
+    return { ...row, report_amount_cents: effectiveReportAmountCents(row.amount_cents, transactionSplit?.personal_amount_cents ?? null) }
+  })
+  const transactions: SummaryTransaction[] = reportRows.map((row) => ({
     date: row.transaction_date,
-    amountCents: row.amount_cents,
+    amountCents: row.report_amount_cents,
     category: (row.category_override ?? row.source_category) as Category | null,
     pending: row.pending,
     providerPending: row.provider_pending,
@@ -47,7 +52,7 @@ export default async function DashboardPage({
   }))
   const summary = summarizeMonth(transactions, month as `${number}-${string}`)
   const pendingCount = countPendingMonth(transactions, month as `${number}-${string}`)
-  const recentRows = (data ?? []).filter((row) => isReportEligible({
+  const recentRows = reportRows.filter((row) => isReportEligible({
     includeInReport: row.include_in_report,
     providerPending: row.provider_pending,
     reviewStatus: row.review_status,
@@ -102,8 +107,8 @@ export default async function DashboardPage({
             {recentRows.map((row, index) => (
               <li key={`${row.transaction_date}-${index}`}>
                 <div><strong>{row.raw_description || '—'}</strong><span>{row.transaction_date}</span></div>
-                <span className={row.amount_cents < 0 ? 'amount-outgoing' : 'amount-incoming'}>
-                  {`${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`}
+                <span className={row.report_amount_cents < 0 ? 'amount-outgoing' : 'amount-incoming'}>
+                  {`${row.report_amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.report_amount_cents), language)}`}
                 </span>
               </li>
             ))}

@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { CATEGORIES } from '@/features/transactions/categories'
 import { normalizeMerchant } from '@/features/transactions/merchant'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
+import { canSaveSplitPayment } from '@/features/transactions/split-payment'
 import { canConfirmImportedTransaction, canIncludeTransaction, canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -25,6 +26,11 @@ const inclusionSchema = z.object({
   transactionId: transactionIdSchema,
   included: z.enum(['true', 'false']),
 })
+const splitSchema = z.object({
+  transactionId: transactionIdSchema,
+  splitCount: z.coerce.number().int().min(2).max(100),
+  personalAmount: z.string().trim().regex(/^\d+(?:\.\d{1,2})?$/),
+})
 
 function manualFields(formData: FormData) {
   return {
@@ -39,8 +45,11 @@ function manualFields(formData: FormData) {
 
 function revalidateLedger() {
   revalidatePath('/transactions')
+  revalidatePath('/reimbursements')
   revalidatePath('/settings')
   revalidatePath('/dashboard')
+  revalidatePath('/reports/monthly')
+  revalidatePath('/api/reports/monthly.xlsx')
 }
 
 export async function createManualTransaction(
@@ -160,6 +169,48 @@ export async function setTransactionIncluded(formData: FormData): Promise<void> 
     include_in_report: parsed.data.included === 'true',
   }).eq('id', parsed.data.transactionId).eq('user_id', user.id).select('id').maybeSingle()
   if (error || !data) throw new Error('Unable to update inclusion setting')
+  revalidateLedger()
+}
+
+export async function saveTransactionSplit(formData: FormData): Promise<ActionState> {
+  const user = await requireUser()
+  const parsed = splitSchema.safeParse({
+    transactionId: formData.get('transaction_id'),
+    splitCount: formData.get('split_count'),
+    personalAmount: formData.get('personal_amount'),
+  })
+  if (!parsed.success) return { status: 'error', message: 'invalidSplit' }
+
+  const personalAmountCents = Math.round(Number(parsed.data.personalAmount) * 100)
+  const supabase = await createServerClient()
+  const { data: transaction, error: transactionError } = await supabase.from('transactions').select('amount_cents')
+    .eq('id', parsed.data.transactionId).eq('user_id', user.id).maybeSingle()
+  if (transactionError || !transaction || !canSaveSplitPayment({
+    amountCents: transaction.amount_cents,
+    splitCount: parsed.data.splitCount,
+    personalAmountCents,
+  })) return { status: 'error', message: 'invalidSplit' }
+
+  const { error } = await supabase.from('transaction_splits').upsert({
+    user_id: user.id,
+    transaction_id: parsed.data.transactionId,
+    split_count: parsed.data.splitCount,
+    personal_amount_cents: personalAmountCents,
+  }, { onConflict: 'transaction_id' })
+  if (error) return { status: 'error', message: 'saveSplitFailed' }
+  revalidateLedger()
+  return { status: 'success', message: '' }
+}
+
+export async function markSplitRequested(formData: FormData): Promise<void> {
+  const user = await requireUser()
+  const transactionId = transactionIdSchema.safeParse(formData.get('transaction_id'))
+  if (!transactionId.success) throw new Error('Invalid transaction')
+
+  const supabase = await createServerClient()
+  const { data, error } = await supabase.from('transaction_splits').update({ requested_at: new Date().toISOString() })
+    .eq('transaction_id', transactionId.data).eq('user_id', user.id).is('requested_at', null).select('id').maybeSingle()
+  if (error || !data) throw new Error('Unable to mark split as requested')
   revalidateLedger()
 }
 

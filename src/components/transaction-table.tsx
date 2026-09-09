@@ -5,6 +5,7 @@ import {
   updateTransactionNote,
 } from '@/app/actions/transactions'
 import { DeleteTransactionForm } from '@/components/delete-transaction-form'
+import { SplitPaymentDialog } from '@/components/split-payment-dialog'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { formatUsd } from '@/features/transactions/money'
@@ -29,6 +30,11 @@ export type TransactionRow = {
     name: string
     mask: string | null
   } | null
+  transaction_split?: {
+    split_count: number
+    personal_amount_cents: number
+    requested_at: string | null
+  } | null
 }
 
 export function TransactionTable({ rows, language = 'en', dictionary }: { rows: TransactionRow[]; language?: Language; dictionary: Dictionary }) {
@@ -51,6 +57,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   <strong>{row.raw_description || '—'}</strong>
                   <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
                   {row.bank_account && <span className="transaction-account-label">{row.bank_account.name}{row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}</span>}
+                  {row.transaction_split && <span className="split-summary">{dictionary.yourShare}: {formatUsd(row.transaction_split.personal_amount_cents, language)}</span>}
                 </td>
                 <td data-label={dictionary.category}>
                   <form action={updateTransactionCategory} className="ledger-inline-form">
@@ -88,6 +95,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                         {row.include_in_report ? dictionary.excludeFromReport : dictionary.includeInReport}
                       </button>
                     </form>
+                    {row.amount_cents < 0 && <SplitPaymentDialog amountCents={row.amount_cents} dictionary={dictionary} split={row.transaction_split} transactionId={row.id} />}
                     {canEditTransaction(row.source) && <Link className="ledger-button" href={`/transactions/${row.id}/edit`}>{dictionary.edit}</Link>}
                     {canDeleteTransaction(row.source) && (
                       <DeleteTransactionForm confirmation={dictionary.deleteConfirmation} label={dictionary.delete} transactionId={row.id} />

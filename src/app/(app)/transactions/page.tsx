@@ -29,7 +29,7 @@ export default async function TransactionsPage({
   const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   let query = supabase.from('transactions').select(
-    'id, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, provider_pending, review_status, include_in_report, bank_account:bank_accounts(name, mask)',
+    'id, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, provider_pending, review_status, include_in_report, bank_account:bank_accounts(name, mask), transaction_split:transaction_splits(split_count, personal_amount_cents, requested_at)',
   ).eq('user_id', user.id).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
@@ -43,6 +43,7 @@ export default async function TransactionsPage({
   const rows = (data ?? []).map((row) => ({
     ...row,
     bank_account: Array.isArray(row.bank_account) ? row.bank_account[0] ?? null : row.bank_account,
+    transaction_split: Array.isArray(row.transaction_split) ? row.transaction_split[0] ?? null : row.transaction_split,
   })) as TransactionRow[]
   const hasFilters = hasTransactionFilters({ month, category })
 
