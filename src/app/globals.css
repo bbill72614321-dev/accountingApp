@@ -68,10 +68,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .month-nav-current { font-size: 0.8rem; font-weight: 700; }
 .month-nav-arrow:hover, .month-nav-current:hover { background: var(--surface-strong); border-color: var(--border-strong); }
 .month-nav-arrow:disabled, .month-nav-current:disabled { cursor: default; opacity: 0.42; }
-.transaction-filter-row { align-items: end; display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0 0 1.5rem; }
+.transaction-filter-row { align-items: center; display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0 0 1.5rem; }
 .transaction-filter-row .month-navigator { margin: 0; }
-.category-filter { align-items: end; display: flex; gap: 0.5rem; }
-.category-filter-field { display: grid; gap: 0.35rem; }
+.category-filter { align-items: center; display: flex; gap: 0.5rem; }
+.category-filter-field { align-items: center; display: flex; gap: 0.5rem; }
 .category-filter label { color: var(--muted-strong); font-size: 0.78rem; font-weight: 650; }
 .category-filter select { min-width: 9rem; }
 .summary-cards { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
