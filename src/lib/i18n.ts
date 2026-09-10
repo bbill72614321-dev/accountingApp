@@ -19,7 +19,7 @@ export type Dictionary = {
   invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
   invalidLogin: string; resetSent: string; updateFailed: string
   recoveryExpired: string; passwordUpdated: string; privateLedgerDescription: string
-  downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; transactionDetails: string
+  downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; allCategories: string; withoutHome: string; transactionDetails: string
   connectBank: string; bankConnectionsDescription: string; noBankConnections: string
   disconnectBank: string; disconnectBankConfirmation: string; disconnectBankError: string
   reimbursements: string; split: string; splitPayment: string; splitCount: string; yourShare: string; amountOwed: string
@@ -49,7 +49,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     recoveryExpired: 'Recovery session expired.', passwordUpdated: 'Password updated.',
     privateLedgerDescription: 'Your monthly picture, kept personal.',
     downloadExcel: 'Download Excel', savePdf: 'Save as PDF', monthlySummary: 'Monthly summary',
-    categorySummary: 'Category summary', transactionDetails: 'Transaction details',
+    categorySummary: 'Category summary', allCategories: 'All categories', withoutHome: 'Without Home', transactionDetails: 'Transaction details',
     connectBank: 'Connect bank', bankConnectionsDescription: 'Connected accounts stay private to this login.', noBankConnections: 'No bank connections yet.',
     disconnectBank: 'Disconnect and delete data', disconnectBankConfirmation: 'Disconnect {institution} and permanently delete its imported data? This cannot be undone.', disconnectBankError: 'Unable to remove this bank connection.',
     reimbursements: 'Reimbursements', split: 'Split', splitPayment: 'Split payment', splitCount: 'People splitting', yourShare: 'Your share',
@@ -78,7 +78,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     recoveryExpired: '密碼重設工作階段已過期。', passwordUpdated: '密碼已更新。',
     privateLedgerDescription: '你的每月帳務，只屬於你。',
     downloadExcel: '下載 Excel', savePdf: '另存為 PDF', monthlySummary: '每月結算',
-    categorySummary: '分類結算', transactionDetails: '交易明細',
+    categorySummary: '分類結算', allCategories: '全部分類', withoutHome: '不含居家', transactionDetails: '交易明細',
     connectBank: '連接銀行', bankConnectionsDescription: '連線帳戶只會屬於目前登入者。', noBankConnections: '尚未連接銀行帳戶。',
     disconnectBank: '解除並刪除資料', disconnectBankConfirmation: '要解除 {institution} 並永久刪除其匯入資料嗎？此操作無法復原。', disconnectBankError: '無法解除此銀行連線。',
     reimbursements: '代墊', split: '拆分', splitPayment: '拆分交易', splitCount: '共幾人分', yourShare: '我實際負擔',
