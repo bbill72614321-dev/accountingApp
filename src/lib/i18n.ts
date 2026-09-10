@@ -17,7 +17,7 @@ export type Dictionary = {
   merchantRules: string; noMerchantRules: string
   traditionalChinese: string; english: string
   invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
-  invalidLogin: string; resetSent: string; updateFailed: string
+  invalidLogin: string; resetSent: string; updateFailed: string; updateLanguageFailed: string
   recoveryExpired: string; passwordUpdated: string; privateLedgerDescription: string
   downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; allCategories: string; withoutHome: string; transactionDetails: string
   connectBank: string; bankConnectionsDescription: string; noBankConnections: string
@@ -45,7 +45,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     traditionalChinese: 'Traditional Chinese', english: 'English',
     invalidTransaction: 'Check the transaction fields and try again.',
     saveTransactionFailed: 'Unable to save the transaction.', updateTransactionFailed: 'Unable to update the transaction.',
-    resetSent: 'If the account exists, a reset link has been sent.', updateFailed: 'Unable to update password.',
+    resetSent: 'If the account exists, a reset link has been sent.', updateFailed: 'Unable to update password.', updateLanguageFailed: 'Unable to update language. Try again.',
     recoveryExpired: 'Recovery session expired.', passwordUpdated: 'Password updated.',
     privateLedgerDescription: 'Your monthly picture, kept personal.',
     downloadExcel: 'Download Excel', savePdf: 'Save as PDF', monthlySummary: 'Monthly summary',
@@ -74,7 +74,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     traditionalChinese: '繁體中文', english: '英文',
     invalidTransaction: '請檢查交易欄位後再試。',
     saveTransactionFailed: '無法儲存交易紀錄。', updateTransactionFailed: '無法更新交易紀錄。',
-    resetSent: '如果帳戶存在，重設連結已寄出。', updateFailed: '無法更新密碼。',
+    resetSent: '如果帳戶存在，重設連結已寄出。', updateFailed: '無法更新密碼。', updateLanguageFailed: '無法更新語言，請再試一次。',
     recoveryExpired: '密碼重設工作階段已過期。', passwordUpdated: '密碼已更新。',
     privateLedgerDescription: '你的每月帳務，只屬於你。',
     downloadExcel: '下載 Excel', savePdf: '另存為 PDF', monthlySummary: '每月結算',
