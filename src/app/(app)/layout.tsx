@@ -13,10 +13,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="app-shell">
       <aside className="app-rail">
-        <div className="app-brand" aria-label="Ledger">
-          <span className="app-brand-mark" aria-hidden="true">L</span>
-          <span>Ledger</span>
-        </div>
         <div className="app-account">
           <span className="account-label">ACCOUNT</span>
           <p className="truncate">{user.email}</p>

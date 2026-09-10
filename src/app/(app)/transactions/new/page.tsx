@@ -9,7 +9,6 @@ export default async function NewTransactionPage() {
     <section className="console-page entry-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">LEDGER / NEW</span>
           <h1>{dictionary.newTransaction}</h1>
         </div>
       </div>

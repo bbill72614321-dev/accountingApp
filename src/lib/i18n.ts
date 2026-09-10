@@ -18,7 +18,7 @@ export type Dictionary = {
   traditionalChinese: string; english: string
   invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
   invalidLogin: string; resetSent: string; updateFailed: string; updateLanguageFailed: string
-  recoveryExpired: string; passwordUpdated: string; privateLedgerDescription: string; monthlySignal: string; reimbursementSignal: string
+  recoveryExpired: string; passwordUpdated: string; personalFinanceDescription: string
   downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; allCategories: string; withoutHome: string; transactionDetails: string
   connectBank: string; bankConnectionsDescription: string; noBankConnections: string
   disconnectBank: string; disconnectBankConfirmation: string; disconnectBankError: string
@@ -47,7 +47,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     saveTransactionFailed: 'Unable to save the transaction.', updateTransactionFailed: 'Unable to update the transaction.',
     resetSent: 'If the account exists, a reset link has been sent.', updateFailed: 'Unable to update password.', updateLanguageFailed: 'Unable to update language. Try again.',
     recoveryExpired: 'Recovery session expired.', passwordUpdated: 'Password updated.',
-    privateLedgerDescription: 'Your monthly picture, kept personal.', monthlySignal: 'LEDGER / MONTHLY SIGNAL', reimbursementSignal: 'LEDGER / REIMBURSEMENTS',
+    personalFinanceDescription: 'Your monthly picture, kept personal.',
     downloadExcel: 'Download Excel', savePdf: 'Save as PDF', monthlySummary: 'Monthly summary',
     categorySummary: 'Category summary', allCategories: 'All categories', withoutHome: 'Without Home', transactionDetails: 'Transaction details',
     connectBank: 'Connect bank', bankConnectionsDescription: 'Connected accounts stay private to this login.', noBankConnections: 'No bank connections yet.',
@@ -76,7 +76,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     saveTransactionFailed: '無法儲存交易紀錄。', updateTransactionFailed: '無法更新交易紀錄。',
     resetSent: '如果帳戶存在，重設連結已寄出。', updateFailed: '無法更新密碼。', updateLanguageFailed: '無法更新語言，請再試一次。',
     recoveryExpired: '密碼重設工作階段已過期。', passwordUpdated: '密碼已更新。',
-    privateLedgerDescription: '你的每月帳務，只屬於你。', monthlySignal: '帳本／每月結算', reimbursementSignal: '帳本／代墊',
+    personalFinanceDescription: '你的每月帳務，只屬於你。',
     downloadExcel: '下載 Excel', savePdf: '另存為 PDF', monthlySummary: '每月結算',
     categorySummary: '分類結算', allCategories: '全部分類', withoutHome: '不含居家', transactionDetails: '交易明細',
     connectBank: '連接銀行', bankConnectionsDescription: '連線帳戶只會屬於目前登入者。', noBankConnections: '尚未連接銀行帳戶。',

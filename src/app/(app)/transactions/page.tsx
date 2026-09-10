@@ -56,7 +56,6 @@ export default async function TransactionsPage({
     <section className="console-page ledger-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">LEDGER / ACTIVITY</span>
           <h1>{dictionary.transactions}</h1>
           <p className="muted">{rows.length} {dictionary.results}</p>
         </div>

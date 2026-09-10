@@ -13,7 +13,7 @@ export async function POST() {
   if ((count ?? 0) >= 10) return NextResponse.json({ error: 'Connection limit reached' }, { status: 409 })
 
   const { data } = await createPlaidClient().linkTokenCreate({
-    user: { client_user_id: user.id }, client_name: 'Private Ledger',
+    user: { client_user_id: user.id }, client_name: 'Personal Finance',
     products: [Products.Transactions], country_codes: [CountryCode.Us], language: 'en',
     transactions: { days_requested: 90 },
     webhook: `${getServerEnv().appUrl}/api/plaid/webhook`,
