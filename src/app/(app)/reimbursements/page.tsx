@@ -37,7 +37,7 @@ export default async function ReimbursementsPage({ searchParams }: { searchParam
     <section className="console-page reimbursement-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">LEDGER / REIMBURSEMENTS</span>
+          <span className="eyebrow">{dictionary.reimbursementSignal}</span>
           <h1>{dictionary.reimbursements}</h1>
           <p className="muted">{rows.length} {dictionary.results}</p>
         </div>

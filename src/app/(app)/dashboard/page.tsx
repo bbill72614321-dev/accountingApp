@@ -63,7 +63,7 @@ export default async function DashboardPage({
     <div className="console-page dashboard-page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">LEDGER / MONTHLY SIGNAL</span>
+          <span className="eyebrow">{dictionary.monthlySignal}</span>
           <h1>{dictionary.dashboard}</h1>
           <p className="muted">{month} · {data?.length ?? 0} {dictionary.results}</p>
         </div>

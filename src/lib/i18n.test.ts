@@ -30,6 +30,13 @@ describe('translations', () => {
     expect(dictionaries['zh-TW'].english).toBe('英文')
   })
 
+  it('translates the monthly and reimbursement page labels', () => {
+    expect(dictionaries.en.monthlySignal).toBe('LEDGER / MONTHLY SIGNAL')
+    expect(dictionaries['zh-TW'].monthlySignal).toBe('帳本／每月結算')
+    expect(dictionaries.en.reimbursementSignal).toBe('LEDGER / REIMBURSEMENTS')
+    expect(dictionaries['zh-TW'].reimbursementSignal).toBe('帳本／代墊')
+  })
+
   it('translates the private ledger description', () => {
     expect(dictionaries.en.privateLedgerDescription).toBe('Your monthly picture, kept personal.')
     expect(dictionaries['zh-TW'].privateLedgerDescription).toBe('你的每月帳務，只屬於你。')
