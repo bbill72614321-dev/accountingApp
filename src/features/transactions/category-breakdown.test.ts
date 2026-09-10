@@ -7,13 +7,13 @@ describe('buildCategoryBreakdown', () => {
     Utility: 0, Entertainment: 0, Learning: 0, Home: 15_000, Cat: 0, Other: 0,
   }
 
-  it('recalculates percentages after Home is excluded', () => {
+  it('sorts by spending and recalculates percentages after Home is excluded', () => {
     const breakdown = buildCategoryBreakdown(spending, 'Home')
 
     expect(breakdown.totalCents).toBe(5_000)
     expect(breakdown.rows).toEqual([
-      { category: 'Travel', valueCents: 2_000, percentage: 40 },
       { category: 'Grocery', valueCents: 3_000, percentage: 60 },
+      { category: 'Travel', valueCents: 2_000, percentage: 40 },
     ])
   })
 })

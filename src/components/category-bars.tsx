@@ -19,15 +19,49 @@ const CATEGORY_COLORS = {
   Other: 'var(--chart-other)',
 } as const
 
-function pieBackground(rows: CategoryBreakdownRow[], totalCents: number) {
-  let start = 0
-  const stops = rows.map((row) => {
+function piePoint(radius: number, angle: number) {
+  const radians = (angle - 90) * Math.PI / 180
+  return { x: 100 + radius * Math.cos(radians), y: 100 + radius * Math.sin(radians) }
+}
+
+function slicePath(start: number, end: number) {
+  if (end - start >= 100) return 'M 100 0 A 100 100 0 1 1 99.99 0 Z'
+  const from = piePoint(100, start / 100 * 360)
+  const to = piePoint(100, end / 100 * 360)
+  const largeArc = end - start > 50 ? 1 : 0
+  return `M 100 100 L ${from.x} ${from.y} A 100 100 0 ${largeArc} 1 ${to.x} ${to.y} Z`
+}
+
+function CategoryPie({ rows, totalCents, language, title }: {
+  rows: CategoryBreakdownRow[]
+  totalCents: number
+  language: Language
+  title: string
+}) {
+  const slices = rows.reduce<Array<CategoryBreakdownRow & { start: number; end: number }>>((items, row) => {
+    const start = items.at(-1)?.end ?? 0
     const end = start + row.valueCents / totalCents * 100
-    const stop = `${CATEGORY_COLORS[row.category]} ${start}% ${end}%`
-    start = end
-    return stop
-  })
-  return `conic-gradient(${stops.join(', ')})`
+    return [...items, { ...row, start, end }]
+  }, [])
+
+  return (
+    <svg className="category-pie" viewBox="0 0 200 200" role="img" aria-label={`${title}: ${formatUsd(totalCents, language)}`}>
+      <title>{`${title}: ${formatUsd(totalCents, language)}`}</title>
+      {slices.map(({ category, percentage, start: sliceStart, end }) => {
+        const middle = (sliceStart + end) / 2 / 100 * 360
+        const labelPoint = piePoint(percentage >= 12 ? 58 : 74, middle)
+        return (
+          <g key={category}>
+            <path d={slicePath(sliceStart, end)} fill={CATEGORY_COLORS[category]} />
+            <text className="category-pie-label" x={labelPoint.x} y={labelPoint.y} textAnchor="middle">
+              <tspan x={labelPoint.x} dy="-0.35em">{CATEGORY_LABELS[category][language]}</tspan>
+              <tspan x={labelPoint.x} dy="1.2em">{percentage}%</tspan>
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
 }
 
 function CategoryChart({
@@ -56,9 +90,7 @@ function CategoryChart({
     <section className="category-chart" aria-labelledby={`category-chart-${title}`}>
       <h3 id={`category-chart-${title}`}>{title}</h3>
       <div className="category-chart-body">
-        <div className="category-pie" role="img" aria-label={`${title}: ${formatUsd(totalCents, language)}`} style={{ background: pieBackground(rows, totalCents) }}>
-          <span>{formatUsd(totalCents, language)}</span>
-        </div>
+        <CategoryPie rows={rows} totalCents={totalCents} language={language} title={title} />
         <ul className="category-pie-legend">
           {rows.map(({ category, valueCents, percentage }) => (
             <li key={category}>
