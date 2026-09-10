@@ -1,11 +1,12 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState } from 'react'
 import type { ActionState } from '@/app/actions/transactions'
 import { CATEGORIES, CATEGORY_LABELS, type Category, type Language } from '@/features/transactions/categories'
 import type { Dictionary } from '@/lib/i18n'
 
-type Labels = Pick<Dictionary, 'merchant' | 'category' | 'noSpendingCategory' | 'date' | 'amount' | 'transactionType' | 'expense' | 'income' | 'note' | 'save' | 'invalidTransaction' | 'saveTransactionFailed' | 'updateTransactionFailed'>
+type Labels = Pick<Dictionary, 'merchant' | 'category' | 'noSpendingCategory' | 'date' | 'amount' | 'transactionType' | 'expense' | 'income' | 'note' | 'save' | 'cancel' | 'invalidTransaction' | 'saveTransactionFailed' | 'updateTransactionFailed'>
 
 const initialState: ActionState = { status: 'idle', message: '' }
 
@@ -55,7 +56,10 @@ export function ManualTransactionForm({
       <label htmlFor="note">{dictionary.note}</label>
       <textarea defaultValue={values.note} id="note" maxLength={1000} name="note" />
       {state.status === 'error' && <p role="alert">{message}</p>}
-      <button className="primary-action" disabled={pending} type="submit">{dictionary.save}</button>
+      <div className="form-actions">
+        <Link className="button" href="/transactions">{dictionary.cancel}</Link>
+        <button className="primary-action" disabled={pending} type="submit">{dictionary.save}</button>
+      </div>
     </form>
   )
 }
