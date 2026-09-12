@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(37);
+select plan(40);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
 values
@@ -59,6 +59,19 @@ select is_empty($$delete from public.transactions where user_id = '22222222-2222
 select throws_ok(
   $$insert into public.transactions (user_id, source, normalized_merchant, transaction_date, amount_cents) values ('22222222-2222-2222-2222-222222222222', 'manual', 'FORGED', '2026-08-03', -3000)$$,
   '42501', null, 'user one cannot insert for user two'
+);
+select lives_ok(
+  $$update public.transactions set user_reviewed_at = '2026-09-12T00:00:00Z' where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'$$,
+  'user one can mark their own transaction as personally reviewed'
+);
+select is(
+  (select user_reviewed_at from public.transactions where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+  '2026-09-12T00:00:00Z'::timestamptz,
+  'personal review timestamp is stored on the owner transaction'
+);
+select is_empty(
+  $$update public.transactions set user_reviewed_at = '2026-09-12T00:00:00Z' where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' returning id$$,
+  'user one cannot mark user two transaction as personally reviewed'
 );
 
 select results_eq('select count(*) from public.bank_items', array[1::bigint], 'user one sees one bank item');
