@@ -8,7 +8,14 @@ vi.mock('@/lib/supabase/server', () => ({ createServerClient }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }))
 
-import { confirmImportedTransaction, createManualTransaction, updateManualTransaction, updateTransactionCategory } from './transactions'
+import {
+  confirmImportedTransaction,
+  createManualTransaction,
+  setTransactionExcluded,
+  setTransactionReviewed,
+  updateManualTransaction,
+  updateTransactionCategory,
+} from './transactions'
 
 describe('transaction action messages', () => {
   it('returns a dictionary key for invalid manual transaction fields', async () => {
@@ -95,17 +102,53 @@ describe('confirmImportedTransaction', () => {
 })
 
 describe('updateTransactionCategory', () => {
-  it('rejects an uncategorized expense even if a form bypasses the disabled option', async () => {
-    const maybeSingle = vi.fn(async () => ({ data: { amount_cents: -1200 }, error: null }))
-    const byUser = vi.fn(() => ({ maybeSingle }))
-    const byId = vi.fn(() => ({ eq: byUser }))
-    const select = vi.fn(() => ({ eq: byId }))
-    const from = vi.fn(() => ({ select }))
-    createServerClient.mockResolvedValue({ from, rpc: vi.fn() })
+  it('allows an imported expense category to be cleared', async () => {
+    const rpc = vi.fn(async () => ({ error: null }))
+    createServerClient.mockResolvedValue({ rpc })
     const formData = new FormData()
     formData.set('transaction_id', 'cccccccc-cccc-4ccc-8ccc-cccccccccccc')
     formData.set('category', '')
 
-    await expect(updateTransactionCategory(formData)).rejects.toThrow('Unable to update transaction category')
+    await updateTransactionCategory(formData)
+
+    expect(rpc).toHaveBeenCalledWith('set_transaction_category_and_rule', {
+      p_transaction_id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      p_category: null,
+    })
+  })
+})
+
+describe('monthly report actions', () => {
+  function updateClient() {
+    const maybeSingle = vi.fn(async () => ({ data: { id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' }, error: null }))
+    const select = vi.fn(() => ({ maybeSingle }))
+    const byUser = vi.fn(() => ({ select }))
+    const byId = vi.fn(() => ({ eq: byUser }))
+    const update = vi.fn(() => ({ eq: byId }))
+    return { update, client: { from: vi.fn(() => ({ update })) } }
+  }
+
+  it('restores report inclusion when undoing a skip', async () => {
+    const { client, update } = updateClient()
+    createServerClient.mockResolvedValue(client)
+    const formData = new FormData()
+    formData.set('transaction_id', 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee')
+    formData.set('excluded', 'false')
+
+    await setTransactionExcluded(formData)
+
+    expect(update).toHaveBeenCalledWith({ include_in_report: true, excluded_from_report: false })
+  })
+
+  it('updates only the personal review timestamp when marked reviewed', async () => {
+    const { client, update } = updateClient()
+    createServerClient.mockResolvedValue(client)
+    const formData = new FormData()
+    formData.set('transaction_id', 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee')
+    formData.set('reviewed', 'true')
+
+    await setTransactionReviewed(formData)
+
+    expect(update).toHaveBeenCalledWith({ user_reviewed_at: expect.any(String) })
   })
 })

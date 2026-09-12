@@ -7,7 +7,7 @@ import { CATEGORIES } from '@/features/transactions/categories'
 import { normalizeMerchant } from '@/features/transactions/merchant'
 import { displayedCategory } from '@/features/transactions/merchant-rule'
 import { canSaveSplitPayment, shouldTrackReimbursement } from '@/features/transactions/split-payment'
-import { canConfirmImportedTransaction, canIncludeTransaction, canUseIncomeCategory, manualTransactionSchema } from '@/features/transactions/validation'
+import { canConfirmImportedTransaction, canIncludeTransaction, manualTransactionSchema } from '@/features/transactions/validation'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
 
@@ -29,6 +29,10 @@ const inclusionSchema = z.object({
 const exclusionSchema = z.object({
   transactionId: transactionIdSchema,
   excluded: z.enum(['true', 'false']),
+})
+const reviewSchema = z.object({
+  transactionId: transactionIdSchema,
+  reviewed: z.enum(['true', 'false']),
 })
 const splitSchema = z.object({
   transactionId: transactionIdSchema,
@@ -118,18 +122,13 @@ export async function deleteTransaction(formData: FormData): Promise<void> {
 }
 
 export async function updateTransactionCategory(formData: FormData): Promise<void> {
-  const user = await requireUser()
+  await requireUser()
   const parsed = transactionCategorySchema.safeParse({
     transactionId: formData.get('transaction_id'), category: formData.get('category'),
   })
   if (!parsed.success) throw new Error('Invalid transaction category')
 
   const supabase = await createServerClient()
-  const { data: transaction, error: transactionError } = await supabase.from('transactions').select('amount_cents')
-    .eq('id', parsed.data.transactionId).eq('user_id', user.id).maybeSingle()
-  if (transactionError || !transaction || (!canUseIncomeCategory(transaction.amount_cents) && parsed.data.category === null)) {
-    throw new Error('Unable to update transaction category')
-  }
   const { error } = await supabase.rpc('set_transaction_category_and_rule', {
     p_transaction_id: parsed.data.transactionId,
     p_category: parsed.data.category,
@@ -187,10 +186,25 @@ export async function setTransactionExcluded(formData: FormData): Promise<void> 
   const isExcluded = parsed.data.excluded === 'true'
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').update({
-    include_in_report: false,
+    include_in_report: !isExcluded,
     excluded_from_report: isExcluded,
   }).eq('id', parsed.data.transactionId).eq('user_id', user.id).select('id').maybeSingle()
   if (error || !data) throw new Error('Unable to update exclusion setting')
+  revalidateLedger()
+}
+
+export async function setTransactionReviewed(formData: FormData): Promise<void> {
+  const user = await requireUser()
+  const parsed = reviewSchema.safeParse({
+    transactionId: formData.get('transaction_id'), reviewed: formData.get('reviewed'),
+  })
+  if (!parsed.success) throw new Error('Invalid review setting')
+
+  const supabase = await createServerClient()
+  const { data, error } = await supabase.from('transactions').update({
+    user_reviewed_at: parsed.data.reviewed === 'true' ? new Date().toISOString() : null,
+  }).eq('id', parsed.data.transactionId).eq('user_id', user.id).select('id').maybeSingle()
+  if (error || !data) throw new Error('Unable to update review setting')
   revalidateLedger()
 }
 
