@@ -325,4 +325,3 @@
 - [ ] **Step 5: Perform the user smoke test.**
 
   On the deployed app, check: an existing non-skipped posted transaction is visible in Monthly; skip removes it there but not in Transactions; undo restores it; changing category/note on either page reflects on the other; split changes monthly amount; pending stays out; a merchant rule classifies a new import; and the personal review check has no side effect beyond its mark.
-
