@@ -40,7 +40,7 @@ export async function GET(request: Request) {
   const report = buildMonthlyExportData({ language, month: month as `${number}-${string}`, transactions })
   const workbook = createXlsx([
     { name: dictionary.monthlySummary, rows: [[dictionary.month, month], [dictionary.totalSpending, report.summary.totalSpendingCents / 100], [dictionary.netAmount, report.summary.netAmountCents / 100]] },
-    { name: dictionary.categorySummary, rows: [[dictionary.category, dictionary.totalSpending], ...report.categoryRows.map(({ category, amountCents }) => [CATEGORY_LABELS[category][language], amountCents / 100])], },
+    { name: dictionary.categorySummary, rows: [[dictionary.category, dictionary.totalSpending], ...report.categoryRows.map(({ category, amountCents }) => [category === 'Uncategorized' ? dictionary.uncategorized : CATEGORY_LABELS[category][language], amountCents / 100])], },
     { name: dictionary.transactionDetails, rows: [[dictionary.merchant, dictionary.category, dictionary.date, dictionary.amount, dictionary.note], ...report.transactionRows.map(([merchant, category, date, amountCents, note]) => [merchant, category, date, amountCents / 100, note])], },
   ])
 

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { z } from 'zod'
 import { CategoryBars } from '@/components/category-bars'
 import { MonthNavigator } from '@/components/month-navigator'
+import { TransactionTable, type TransactionRow } from '@/components/transaction-table'
 import type { Category } from '@/features/transactions/categories'
 import { availableMonths } from '@/features/transactions/month-navigation'
 import { countPendingMonth, isReportEligible, summarizeMonth, type SummaryTransaction } from '@/features/transactions/monthly-summary'
@@ -29,7 +30,7 @@ export default async function DashboardPage({
   const user = await requireUser()
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
-    'raw_description, transaction_date, amount_cents, source_category, category_override, pending, provider_pending, review_status, include_in_report, transaction_split:transaction_splits(personal_amount_cents)',
+    'id, created_at, source, raw_description, transaction_date, amount_cents, note, source_category, category_override, pending, provider_pending, review_status, user_reviewed_at, include_in_report, excluded_from_report, bank_account:bank_accounts(name, mask), transaction_split:transaction_splits(split_count, personal_amount_cents, requested_at)',
   ).eq('user_id', user.id).gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
     .order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load monthly summary')
@@ -57,7 +58,11 @@ export default async function DashboardPage({
     providerPending: row.provider_pending,
     reviewStatus: row.review_status,
     currency: 'USD',
-  }))
+  })).map((row) => ({
+    ...row,
+    bank_account: Array.isArray(row.bank_account) ? row.bank_account[0] ?? null : row.bank_account,
+    transaction_split: Array.isArray(row.transaction_split) ? row.transaction_split[0] ?? null : row.transaction_split,
+  })) as TransactionRow[]
 
   return (
     <div className="console-page dashboard-page">
@@ -101,18 +106,7 @@ export default async function DashboardPage({
           <h2>{dictionary.transactions}</h2>
           <Link href={`/transactions?month=${month}`}>{dictionary.transactions} →</Link>
         </div>
-        {recentRows.length === 0 ? <p className="muted">{dictionary.noTransactions}</p> : (
-          <ul className="activity-list">
-            {recentRows.map((row, index) => (
-              <li key={`${row.transaction_date}-${index}`}>
-                <div><strong>{row.raw_description || '—'}</strong><span>{row.transaction_date}</span></div>
-                <span className={row.report_amount_cents < 0 ? 'amount-outgoing' : 'amount-incoming'}>
-                  {`${row.report_amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.report_amount_cents), language)}`}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        {recentRows.length === 0 ? <p className="muted">{dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={recentRows} />}
       </section>
     </div>
   )

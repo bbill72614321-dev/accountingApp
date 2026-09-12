@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { MonthNavigator } from '@/components/month-navigator'
 import { TransactionTable, type TransactionRow } from '@/components/transaction-table'
 import { CATEGORIES, CATEGORY_LABELS } from '@/features/transactions/categories'
-import { effectiveCategoryFilter } from '@/features/transactions/merchant-rule'
+import { effectiveCategoryFilter, type CategoryFilter } from '@/features/transactions/merchant-rule'
 import { compareTransactionDisplayOrder } from '@/features/transactions/display-order'
 import { availableMonths } from '@/features/transactions/month-navigation'
 import { requireUser } from '@/lib/auth'
@@ -23,14 +23,14 @@ export default async function TransactionsPage({
 }: { searchParams: Promise<{ month?: string; category?: string }> }) {
   const { month: rawMonth, category: rawCategory } = await searchParams
   const month = monthSchema.safeParse(rawMonth).data
-  const category = z.enum(CATEGORIES).safeParse(rawCategory).data
+  const category = z.union([z.enum(CATEGORIES), z.literal('Uncategorized')]).safeParse(rawCategory).data as CategoryFilter | undefined
   const homeMonth = new Date().toISOString().slice(0, 7)
   const user = await requireUser()
   const language = await getLanguage()
   const dictionary = getDictionary(language)
   const supabase = await createServerClient()
   let query = supabase.from('transactions').select(
-    'id, created_at, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, provider_pending, review_status, include_in_report, excluded_from_report, bank_account:bank_accounts(name, mask), transaction_split:transaction_splits(split_count, personal_amount_cents, requested_at)',
+    'id, created_at, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, provider_pending, review_status, user_reviewed_at, include_in_report, excluded_from_report, bank_account:bank_accounts(name, mask), transaction_split:transaction_splits(split_count, personal_amount_cents, requested_at)',
   ).eq('user_id', user.id).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
@@ -69,6 +69,7 @@ export default async function TransactionsPage({
             <label htmlFor="filter-category">{dictionary.category}</label>
             <select defaultValue={category ?? ''} id="filter-category" name="category">
               <option value="">—</option>
+              <option value="Uncategorized">{dictionary.uncategorized}</option>
               {CATEGORIES.map((item) => <option key={item} value={item}>{CATEGORY_LABELS[item][language]}</option>)}
             </select>
           </div>

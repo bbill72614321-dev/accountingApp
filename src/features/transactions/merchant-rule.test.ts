@@ -17,4 +17,10 @@ describe('effectiveCategoryFilter', () => {
       'category_override.eq."Grocery",and(category_override.is.null,source_category.eq."Grocery")',
     )
   })
+
+  it('filters uncategorized expenses without sending a virtual category to the database enum', () => {
+    expect(effectiveCategoryFilter('Uncategorized')).toBe(
+      'and(category_override.is.null,source_category.is.null,amount_cents.lt.0)',
+    )
+  })
 })

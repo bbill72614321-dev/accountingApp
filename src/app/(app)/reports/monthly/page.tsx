@@ -52,7 +52,7 @@ export default async function PrintableMonthlyReport({ searchParams }: { searchP
       </dl>
       <h2>{dictionary.categorySummary}</h2>
       <table><thead><tr><th>{dictionary.category}</th><th>{dictionary.totalSpending}</th></tr></thead><tbody>
-        {report.categoryRows.map(({ category, amountCents }) => <tr key={category}><td>{CATEGORY_LABELS[category][language]}</td><td>{formatUsd(amountCents, language)}</td></tr>)}
+        {report.categoryRows.map(({ category, amountCents }) => <tr key={category}><td>{category === 'Uncategorized' ? dictionary.uncategorized : CATEGORY_LABELS[category][language]}</td><td>{formatUsd(amountCents, language)}</td></tr>)}
       </tbody></table>
       <h2>{dictionary.transactionDetails}</h2>
       <table><thead><tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th></tr></thead><tbody>

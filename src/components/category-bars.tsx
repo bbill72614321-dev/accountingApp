@@ -19,6 +19,14 @@ const CATEGORY_COLORS = {
   Other: 'var(--chart-other)',
 } as const
 
+function categoryColor(category: CategoryBreakdownRow['category']) {
+  return category === 'Uncategorized' ? 'var(--muted)' : CATEGORY_COLORS[category]
+}
+
+function categoryLabel(category: CategoryBreakdownRow['category'], language: Language, dictionary: Dictionary) {
+  return category === 'Uncategorized' ? dictionary.uncategorized : CATEGORY_LABELS[category][language]
+}
+
 function piePoint(radius: number, angle: number) {
   const radians = (angle - 90) * Math.PI / 180
   return { x: 100 + radius * Math.cos(radians), y: 100 + radius * Math.sin(radians) }
@@ -32,10 +40,11 @@ function slicePath(start: number, end: number) {
   return `M 100 100 L ${from.x} ${from.y} A 100 100 0 ${largeArc} 1 ${to.x} ${to.y} Z`
 }
 
-function CategoryPie({ rows, totalCents, language, title }: {
+function CategoryPie({ rows, totalCents, language, dictionary, title }: {
   rows: CategoryBreakdownRow[]
   totalCents: number
   language: Language
+  dictionary: Dictionary
   title: string
 }) {
   const slices = rows.reduce<Array<CategoryBreakdownRow & { start: number; end: number }>>((items, row) => {
@@ -52,9 +61,9 @@ function CategoryPie({ rows, totalCents, language, title }: {
         const labelPoint = piePoint(percentage >= 12 ? 58 : 74, middle)
         return (
           <g key={category}>
-            <path d={slicePath(sliceStart, end)} fill={CATEGORY_COLORS[category]} />
+            <path d={slicePath(sliceStart, end)} fill={categoryColor(category)} />
             <text className="category-pie-label" x={labelPoint.x} y={labelPoint.y} textAnchor="middle">
-              <tspan x={labelPoint.x} dy="-0.35em">{CATEGORY_LABELS[category][language]}</tspan>
+              <tspan x={labelPoint.x} dy="-0.35em">{categoryLabel(category, language, dictionary)}</tspan>
               <tspan x={labelPoint.x} dy="1.2em">{percentage}%</tspan>
             </text>
           </g>
@@ -90,13 +99,13 @@ function CategoryChart({
     <section className="category-chart" aria-labelledby={`category-chart-${title}`}>
       <h3 id={`category-chart-${title}`}>{title}</h3>
       <div className="category-chart-body">
-        <CategoryPie rows={rows} totalCents={totalCents} language={language} title={title} />
+        <CategoryPie rows={rows} totalCents={totalCents} language={language} dictionary={dictionary} title={title} />
         <ul className="category-pie-legend">
           {rows.map(({ category, valueCents, percentage }) => (
             <li key={category}>
-              <span className="category-swatch" style={{ backgroundColor: CATEGORY_COLORS[category] }} aria-hidden="true" />
+              <span className="category-swatch" style={{ backgroundColor: categoryColor(category) }} aria-hidden="true" />
               <Link href={`/transactions?month=${month}&category=${encodeURIComponent(category)}`}>
-                {CATEGORY_LABELS[category][language]}
+                {categoryLabel(category, language, dictionary)}
               </Link>
               <span>{formatUsd(valueCents, language)} · {percentage}%</span>
             </li>
@@ -113,8 +122,8 @@ export function CategoryBars({ summary, language, dictionary, month }: {
   dictionary: Dictionary
   month: string
 }) {
-  const fullBreakdown = buildCategoryBreakdown(summary.categorySpending)
-  const withoutHomeBreakdown = buildCategoryBreakdown(summary.categorySpending, 'Home')
+  const fullBreakdown = buildCategoryBreakdown(summary.categorySpending, undefined, summary.uncategorizedSpendingCents)
+  const withoutHomeBreakdown = buildCategoryBreakdown(summary.categorySpending, 'Home', summary.uncategorizedSpendingCents)
 
   return (
     <div className="category-chart-grid">
