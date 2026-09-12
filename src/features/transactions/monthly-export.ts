@@ -25,16 +25,24 @@ export function buildMonthlyExportData({
     }))
     .map((transaction): MonthlyExportRow => [
       transaction.merchant,
-      transaction.category ? CATEGORY_LABELS[transaction.category][language] : language === 'en' ? 'Income / no spending category' : '收入／不列支出分類',
+      transaction.category
+        ? CATEGORY_LABELS[transaction.category][language]
+        : transaction.amountCents < 0
+          ? language === 'en' ? 'Uncategorized' : '未分類'
+          : language === 'en' ? 'Income / no spending category' : '收入／不列支出分類',
       transaction.date,
       transaction.amountCents,
       transaction.note,
     ])
 
-  const categoryRows = CATEGORIES.flatMap((category: Category) => {
+  const categoryRows: Array<{ category: Category | 'Uncategorized'; amountCents: number }> = CATEGORIES.flatMap((category: Category) => {
     const amountCents = summary.categorySpending[category]
     return amountCents > 0 ? [{ category, amountCents }] : []
   })
+
+  if (summary.uncategorizedSpendingCents > 0) {
+    categoryRows.push({ category: 'Uncategorized', amountCents: summary.uncategorizedSpendingCents })
+  }
 
   return { summary, categoryRows, transactionRows }
 }

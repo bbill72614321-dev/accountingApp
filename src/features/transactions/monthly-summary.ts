@@ -28,6 +28,7 @@ export type MonthlySummary = {
   totalSpendingCents: number
   netAmountCents: number
   categorySpending: Record<Category, number>
+  uncategorizedSpendingCents: number
 }
 
 export function summarizeMonth(
@@ -36,6 +37,7 @@ export function summarizeMonth(
 ): MonthlySummary {
   const categorySpending = Object.fromEntries(CATEGORIES.map((name) => [name, 0])) as Record<Category, number>
   let netAmountCents = 0
+  let uncategorizedSpendingCents = 0
 
   for (const transaction of transactions) {
     if (!transaction.date.startsWith(`${month}-`) || !isReportEligible({
@@ -46,10 +48,12 @@ export function summarizeMonth(
     })) continue
     netAmountCents += transaction.amountCents
     if (transaction.category) categorySpending[transaction.category] -= transaction.amountCents
+    else if (transaction.amountCents < 0) uncategorizedSpendingCents -= transaction.amountCents
   }
 
-  const totalSpendingCents = Math.max(0, Object.values(categorySpending).reduce((sum, value) => sum + value, 0))
-  return { totalSpendingCents, netAmountCents, categorySpending }
+  const categorizedSpendingCents = Object.values(categorySpending).reduce((sum, value) => sum + value, 0)
+  const totalSpendingCents = Math.max(0, categorizedSpendingCents + uncategorizedSpendingCents)
+  return { totalSpendingCents, netAmountCents, categorySpending, uncategorizedSpendingCents }
 }
 
 export function countPendingMonth(

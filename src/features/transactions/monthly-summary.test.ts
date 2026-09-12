@@ -30,6 +30,17 @@ describe('summarizeMonth', () => {
     expect(summary.categorySpending.Travel).toBe(0)
   })
 
+  it('counts an uncategorized outgoing transaction in total spending without treating income as a category expense', () => {
+    const summary = summarizeMonth([
+      tx({ amountCents: -2_500, category: null }),
+      tx({ amountCents: 900, category: null }),
+    ], '2026-08')
+
+    expect(summary.totalSpendingCents).toBe(2_500)
+    expect(summary.uncategorizedSpendingCents).toBe(2_500)
+    expect(summary.netAmountCents).toBe(-1_600)
+  })
+
   it('counts only in-month pending transactions for review', () => {
     expect(countPendingMonth([
       tx({ pending: true }),

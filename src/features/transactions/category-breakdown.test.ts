@@ -16,4 +16,15 @@ describe('buildCategoryBreakdown', () => {
       { category: 'Travel', valueCents: 2_000, percentage: 40 },
     ])
   })
+
+  it('adds uncategorized spending as a display-only category and sorts it by amount', () => {
+    const breakdown = buildCategoryBreakdown(spending, undefined, 4_000)
+
+    expect(breakdown.rows).toEqual([
+      { category: 'Home', valueCents: 15_000, percentage: 62.5 },
+      { category: 'Uncategorized', valueCents: 4_000, percentage: 16.7 },
+      { category: 'Grocery', valueCents: 3_000, percentage: 12.5 },
+      { category: 'Travel', valueCents: 2_000, percentage: 8.3 },
+    ])
+  })
 })
