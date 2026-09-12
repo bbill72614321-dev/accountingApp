@@ -5,6 +5,7 @@ import { decryptAccessToken } from '@/lib/plaid/crypto'
 import type { OwnedItemDeletionRepository } from './disconnect-owned-item'
 import type { PlaidSyncRepository } from './sync-owned-item'
 import { requireLinkedBankAccountId } from './transaction-account-mapping'
+import { defaultCategoryForMerchant, type MerchantCategoryRule } from './default-category'
 
 export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncRepository & OwnedItemDeletionRepository {
   return {
@@ -30,6 +31,14 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
         .in('plaid_account_id', plaidAccountIds)
       if (accountsError) throw new Error('Unable to load linked bank accounts')
       const localAccountIdByPlaidAccountId = new Map((accounts ?? []).map((account) => [account.plaid_account_id, account.id]))
+      const { data: merchantRules, error: merchantRulesError } = await admin.from('merchant_rules')
+        .select('normalized_merchant, category')
+        .eq('user_id', firstRow.userId)
+      if (merchantRulesError) throw new Error('Unable to load merchant category rules')
+      const rules: MerchantCategoryRule[] = (merchantRules ?? []).map((rule) => ({
+        normalizedMerchant: rule.normalized_merchant,
+        category: rule.category,
+      }))
       const records = rows.map((row) => ({
         user_id: row.userId, source: 'plaid', external_id: row.externalId,
         bank_item_id: row.itemId, bank_account_id: requireLinkedBankAccountId(localAccountIdByPlaidAccountId, row.providerAccountId),
@@ -37,6 +46,7 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
         transaction_date: row.transactionDate, amount_cents: row.amountCents,
         pending: row.providerPending, provider_pending: row.providerPending,
         review_status: row.reviewStatus, original_currency_code: row.currency,
+        source_category: defaultCategoryForMerchant(row.normalizedMerchant, rules),
       }))
       const { error } = await admin.from('transactions').upsert(records, { onConflict: 'user_id,source,external_id' })
       if (error) throw new Error('Unable to save Plaid transactions')
