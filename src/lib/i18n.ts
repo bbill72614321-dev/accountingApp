@@ -26,6 +26,7 @@ export type Dictionary = {
   requestSent: string; markRequested: string; noReimbursements: string; totalCharged: string; invalidSplit: string; saveSplitFailed: string; cancel: string; people: string
   skipFromReport: string; undoSkip: string; skipped: string
   uncategorized: string; reviewed: string; markReviewed: string
+  allTransactions: string; unreviewedTransactions: string
 }
 
 export const dictionaries: Record<Language, Dictionary> = {
@@ -58,6 +59,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     invalidSplit: 'Enter a valid personal share for this outgoing transaction.', saveSplitFailed: 'Unable to save the split payment.', cancel: 'Cancel', people: 'people',
     skipFromReport: 'Skip', undoSkip: 'Undo skip', skipped: 'Skipped',
     uncategorized: 'Uncategorized', reviewed: 'Reviewed', markReviewed: 'Mark reviewed',
+    allTransactions: 'All transactions', unreviewedTransactions: 'Unreviewed',
   },
   'zh-TW': {
     login: '登入', email: '電子郵件', password: '密碼', forgotPassword: '忘記密碼？',
@@ -88,6 +90,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     invalidSplit: '請為這筆支出輸入有效的個人負擔金額。', saveSplitFailed: '無法儲存拆分交易。', cancel: '取消', people: '人分',
     skipFromReport: '略過', undoSkip: '取消略過', skipped: '已略過',
     uncategorized: '未分類', reviewed: '已看過', markReviewed: '標記已看過',
+    allTransactions: '全部交易', unreviewedTransactions: '未看過',
   },
 }
 

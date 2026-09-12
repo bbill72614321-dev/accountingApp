@@ -8,6 +8,7 @@ import { availableMonths } from '@/features/transactions/month-navigation'
 import { countPendingMonth, isReportEligible, summarizeMonth, type SummaryTransaction } from '@/features/transactions/monthly-summary'
 import { formatUsd } from '@/features/transactions/money'
 import { effectiveReportAmountCents } from '@/features/transactions/split-payment'
+import { filterReportRowsByReview, type ReviewFilter } from '@/features/transactions/review-filter'
 import { getDictionary, getLanguage } from '@/lib/i18n'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -21,10 +22,11 @@ function nextMonth(month: string) {
 
 export default async function DashboardPage({
   searchParams,
-}: { searchParams: Promise<{ month?: string }> }) {
-  const { month: rawMonth } = await searchParams
+}: { searchParams: Promise<{ month?: string; review?: string }> }) {
+  const { month: rawMonth, review: rawReview } = await searchParams
   const homeMonth = new Date().toISOString().slice(0, 7)
   const month = monthSchema.safeParse(rawMonth).data ?? homeMonth
+  const reviewFilter = z.enum(['all', 'unreviewed']).safeParse(rawReview).data as ReviewFilter | undefined ?? 'all'
   const language = await getLanguage()
   const dictionary = getDictionary(language)
   const user = await requireUser()
@@ -63,6 +65,8 @@ export default async function DashboardPage({
     bank_account: Array.isArray(row.bank_account) ? row.bank_account[0] ?? null : row.bank_account,
     transaction_split: Array.isArray(row.transaction_split) ? row.transaction_split[0] ?? null : row.transaction_split,
   })) as TransactionRow[]
+  const visibleRows = filterReportRowsByReview(recentRows, reviewFilter)
+  const reviewFilterHref = (filter: ReviewFilter) => `/dashboard?month=${month}&review=${filter}`
 
   return (
     <div className="console-page dashboard-page">
@@ -104,9 +108,15 @@ export default async function DashboardPage({
       <section className="recent-activity console-panel">
         <div className="section-heading">
           <h2>{dictionary.transactions}</h2>
-          <Link href={`/transactions?month=${month}`}>{dictionary.transactions} →</Link>
+          <div className="section-heading-actions">
+            <nav aria-label={dictionary.transactions} className="report-row-filter">
+              <Link className={reviewFilter === 'all' ? 'is-active' : undefined} href={reviewFilterHref('all')}>{dictionary.allTransactions}</Link>
+              <Link className={reviewFilter === 'unreviewed' ? 'is-active' : undefined} href={reviewFilterHref('unreviewed')}>{dictionary.unreviewedTransactions}</Link>
+            </nav>
+            <Link href={`/transactions?month=${month}`}>{dictionary.transactions} →</Link>
+          </div>
         </div>
-        {recentRows.length === 0 ? <p className="muted">{dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={recentRows} />}
+        {visibleRows.length === 0 ? <p className="muted">{dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={visibleRows} />}
       </section>
     </div>
   )
