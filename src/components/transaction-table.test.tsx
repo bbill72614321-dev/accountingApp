@@ -31,5 +31,6 @@ describe('TransactionTable', () => {
     expect(html).toContain('已看過')
     expect(html).toContain('略過')
     expect(html).toContain('data-auto-category="true"')
+    expect(html).toContain('ledger-merchant-details')
   })
 })

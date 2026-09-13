@@ -57,12 +57,18 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             return (
               <tr className={reportDisposition === 'excluded' ? 'ledger-row-resolved' : undefined} key={row.id}>
                 <td className="ledger-merchant" data-label={dictionary.merchant}>
-                  <strong>{row.raw_description || '—'}</strong>
-                  <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
-                  {row.bank_account && <span className="transaction-account-label">{row.bank_account.name}{row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}</span>}
-                  {row.transaction_split && shouldTrackReimbursement(Math.abs(row.amount_cents), row.transaction_split.personal_amount_cents) && (
-                    <span className="split-summary">{dictionary.yourShare}: {formatUsd(row.transaction_split.personal_amount_cents, language)}</span>
-                  )}
+                  <strong className="ledger-merchant-title">{row.raw_description || '—'}</strong>
+                  <span className="ledger-merchant-details">
+                    <span className="ledger-merchant-source-line">
+                      <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
+                      <span className="transaction-account-label">{row.bank_account ? `${row.bank_account.name}${row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}` : '\u00a0'}</span>
+                    </span>
+                    <span className="split-summary">
+                      {row.transaction_split && shouldTrackReimbursement(Math.abs(row.amount_cents), row.transaction_split.personal_amount_cents)
+                        ? `${dictionary.yourShare}: ${formatUsd(row.transaction_split.personal_amount_cents, language)}`
+                        : '\u00a0'}
+                    </span>
+                  </span>
                 </td>
                 <td data-label={dictionary.category}>
                   <TransactionCategorySelect category={category} dictionary={dictionary} language={language} transactionId={row.id} />
