@@ -135,6 +135,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .ledger-table th { border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.09em; padding: 0.85rem 0.75rem; text-align: left; white-space: nowrap; }
 .ledger-table td { border-bottom: 1px solid var(--border); color: var(--muted-strong); font-size: 0.84rem; padding: 0.85rem 0.75rem; vertical-align: middle; }
 @media (min-width: 761px) {
+  .ledger-table { table-layout: fixed; }
+  .ledger-merchant-column { width: 14rem; }
+  .ledger-category-column { width: 10rem; }
   .ledger-table tbody tr { height: 6.75rem; }
   .ledger-table td { height: 6.75rem; }
 }
@@ -151,7 +154,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .status-label.is-pending { border-color: #69562b; color: var(--review); }
 .ledger-inline-form { align-items: center; display: flex; gap: 0.5rem; min-width: 11rem; }
 .ledger-inline-form select, .ledger-inline-form input { height: 2.25rem; min-width: 0; padding: 0.4rem 0.55rem; width: 100%; }
-.transaction-category-control { min-width: 10.5rem; }
+.transaction-category-control { min-width: 0; width: 8.25rem; }
 .transaction-category-control select { height: 2.25rem; min-width: 0; padding: 0.4rem 0.55rem; width: 100%; }
 .transaction-category-control p { color: var(--danger); font-size: 0.72rem; margin: 0.35rem 0 0; }
 .transaction-reviewed-toggle { align-items: center; color: var(--muted-strong); cursor: pointer; display: inline-flex; font-size: 0.75rem; font-weight: 700; gap: 0.35rem; min-height: 2.25rem; white-space: nowrap; }
@@ -241,6 +244,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .ledger-table td { align-items: center; border: 0; display: grid; grid-template-columns: minmax(5.5rem, 0.7fr) minmax(0, 1fr); gap: 0.65rem; padding: 0.3rem 0; }
   .ledger-table td::before { color: var(--muted); content: attr(data-label); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.08em; }
   .ledger-merchant { min-width: 0; }
+  .transaction-category-control { width: 100%; }
   .ledger-merchant-title { white-space: normal; }
   .ledger-merchant-source-line { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
   .transaction-account-label, .split-summary { height: auto; overflow: visible; white-space: normal; }

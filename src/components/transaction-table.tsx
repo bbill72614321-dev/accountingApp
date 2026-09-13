@@ -44,6 +44,15 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
   return (
     <div className="ledger-table-wrap">
       <table className="ledger-table">
+        <colgroup>
+          <col className="ledger-merchant-column" />
+          <col className="ledger-category-column" />
+          <col />
+          <col />
+          <col />
+          <col />
+          <col />
+        </colgroup>
         <thead>
           <tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th><th>{dictionary.status}</th><th>{dictionary.edit}</th></tr>
         </thead>

@@ -32,5 +32,7 @@ describe('TransactionTable', () => {
     expect(html).toContain('略過')
     expect(html).toContain('data-auto-category="true"')
     expect(html).toContain('ledger-merchant-details')
+    expect(html).toContain('ledger-merchant-column')
+    expect(html).toContain('ledger-category-column')
   })
 })
