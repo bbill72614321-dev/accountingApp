@@ -34,5 +34,7 @@ describe('TransactionTable', () => {
     expect(html).toContain('ledger-merchant-details')
     expect(html).toContain('ledger-merchant-column')
     expect(html).toContain('ledger-category-column')
+    expect(html).toContain('ledger-note-column')
+    expect(html).toContain('ledger-status-column')
   })
 })

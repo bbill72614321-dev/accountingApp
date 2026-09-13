@@ -138,8 +138,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .ledger-table { table-layout: fixed; }
   .ledger-merchant-column { width: 14rem; }
   .ledger-category-column { width: 10rem; }
+  .ledger-date-column { width: 7.5rem; }
+  .ledger-amount-column { width: 7rem; }
+  .ledger-note-column { width: 15rem; }
+  .ledger-status-column { width: 7rem; }
+  .ledger-actions-column { width: 20rem; }
   .ledger-table tbody tr { height: 6.75rem; }
   .ledger-table td { height: 6.75rem; }
+  .ledger-inline-form { width: 100%; }
 }
 .ledger-table tbody tr.ledger-row-resolved { opacity: 0.5; }
 .ledger-table tbody tr.ledger-row-resolved:hover { opacity: 0.76; }
