@@ -23,7 +23,7 @@ describe('MonthlyTransactionList', () => {
 
     expect(html).toContain('<button')
     expect(html).toContain('全部交易')
-    expect(html).toContain('未看過')
+    expect(html).toContain('未審核')
     expect(html).not.toContain('href=')
   })
 })

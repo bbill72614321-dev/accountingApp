@@ -35,7 +35,6 @@ export function TransactionReviewedToggle({
   return (
     <label className="transaction-reviewed-toggle">
       <input aria-label={dictionary.markReviewed} checked={reviewed} disabled={isPending} onChange={toggle} type="checkbox" />
-      <span>{dictionary.reviewed}</span>
     </label>
   )
 }

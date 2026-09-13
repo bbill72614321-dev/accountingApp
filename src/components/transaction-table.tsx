@@ -54,7 +54,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
           <col className="ledger-actions-column" />
         </colgroup>
         <thead>
-          <tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th><th>{dictionary.status}</th><th>{dictionary.edit}</th></tr>
+          <tr><th>{dictionary.merchant}</th><th>{dictionary.category}</th><th>{dictionary.date}</th><th>{dictionary.amount}</th><th>{dictionary.note}</th><th>{dictionary.status}</th><th>{dictionary.review}</th></tr>
         </thead>
         <tbody>
           {rows.map((row) => {
@@ -99,7 +99,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                       ? <span className="status-label">{dictionary.skipped}</span>
                       : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
-                <td data-label={dictionary.edit}>
+                <td data-label={dictionary.review}>
                   <div className="ledger-actions">
                     <TransactionReviewedToggle dictionary={dictionary} reviewedAt={row.user_reviewed_at} transactionId={row.id} />
                     {reportDisposition === 'excluded' ? (
