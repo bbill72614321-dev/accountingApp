@@ -65,7 +65,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             const reportDisposition = transactionReportDisposition({ included: row.include_in_report, excluded: row.excluded_from_report })
             return (
               <tr className={reportDisposition === 'excluded' ? 'ledger-row-resolved' : undefined} key={row.id}>
-                <td className="ledger-merchant" data-label={dictionary.merchant}>
+                <td className="ledger-merchant ledger-mobile-merchant" data-label={dictionary.merchant}>
                   <strong className="ledger-merchant-title">{row.raw_description || '—'}</strong>
                   <span className="ledger-merchant-details">
                     <span className="ledger-merchant-source-line">
@@ -99,7 +99,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                       ? <span className="status-label">{dictionary.skipped}</span>
                       : <span className={`status-label ${row.pending ? 'is-pending' : ''}`}>{dictionary[transactionStatus(row.pending)]}</span>}
                 </td>
-                <td data-label={dictionary.review}>
+                <td className="ledger-review-cell" data-label={dictionary.review}>
                   <div className="ledger-actions">
                     <TransactionReviewedToggle dictionary={dictionary} reviewedAt={row.user_reviewed_at} transactionId={row.id} />
                     {reportDisposition === 'excluded' ? (
