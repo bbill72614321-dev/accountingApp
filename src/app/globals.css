@@ -222,7 +222,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @media (max-width: 760px) {
   .category-chart-grid { grid-template-columns: 1fr; }
-  .category-chart-body { grid-template-columns: minmax(7.5rem, 0.75fr) minmax(0, 1.25fr); }
+  .category-chart-body { display: block; }
+  .category-pie { display: none; }
   .app-shell { display: block; }
   .app-rail { align-self: auto; border-bottom: 1px solid var(--border); border-right: 0; gap: 0.85rem; height: auto; min-height: auto; overflow-y: visible; padding: 1rem; position: static; }
   .app-account { display: inline-grid; margin-right: 1rem; vertical-align: top; }
