@@ -259,10 +259,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .transaction-account-label, .split-summary { height: auto; overflow: visible; white-space: normal; }
   .split-summary.is-empty { display: none; }
   .ledger-inline-form { min-width: 0; width: 100%; }
-  .ledger-inline-form select, .ledger-inline-form input, .transaction-category-control select { height: 2.75rem; }
+  .ledger-inline-form select, .ledger-inline-form input, .transaction-category-control select { height: 2.25rem; }
   .ledger-table td.ledger-review-cell { border-top: 1px solid var(--border); margin-top: 0.4rem; padding-top: 0.6rem; }
   .ledger-actions { align-items: center; flex-wrap: wrap; min-width: 0; }
-  .ledger-actions .ledger-button, .ledger-actions .transaction-reviewed-toggle { min-height: 2.75rem; }
+  .ledger-actions .ledger-button { height: 2.25rem; min-height: 2.25rem; }
+  .ledger-actions .transaction-reviewed-toggle { justify-content: center; min-height: 2.75rem; min-width: 2.75rem; }
+  .transaction-reviewed-toggle .transaction-reviewed-checkbox { height: 1.25rem; width: 1.25rem; }
   .ledger-actions .ledger-button, .status-label { font-size: 0.78rem; }
   .reimbursement-row { align-items: start; grid-template-columns: 1fr; }
   .reimbursement-amounts { max-width: 26rem; }

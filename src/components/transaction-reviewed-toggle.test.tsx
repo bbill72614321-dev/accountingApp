@@ -14,6 +14,7 @@ describe('TransactionReviewedToggle', () => {
     )
 
     expect(html).toContain('type="checkbox"')
+    expect(html).toContain('transaction-reviewed-checkbox')
     expect(html).toContain('aria-label="標記已審核"')
     expect(html).not.toContain('已看過')
   })
