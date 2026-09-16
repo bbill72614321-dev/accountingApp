@@ -244,24 +244,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .ledger-table { min-width: 0; }
   .ledger-table thead { display: none; }
   .ledger-table, .ledger-table tbody, .ledger-table tr, .ledger-table td { display: block; width: 100%; }
-  .ledger-table tr { border-bottom: 1px solid var(--border); padding: 0.85rem; }
+  .ledger-table tr { border-bottom: 1px solid var(--border); padding: 0.75rem; }
   .ledger-table tbody tr, .ledger-table td { height: auto; }
   .ledger-table tbody tr:last-child { border-bottom: 0; }
-  .ledger-table td { align-items: center; border: 0; display: grid; font-size: 0.9rem; grid-template-columns: minmax(5.5rem, 0.7fr) minmax(0, 1fr); gap: 0.65rem; padding: 0.4rem 0; }
-  .ledger-table td::before { color: var(--muted); content: attr(data-label); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.08em; }
+  .ledger-table td { align-items: center; border: 0; display: grid; font-size: 0.9rem; grid-template-columns: minmax(5.5rem, 0.7fr) minmax(0, 1fr); gap: 0.65rem; padding: 0.25rem 0; }
+  .ledger-table td::before { color: var(--muted); content: attr(data-label); font-size: 0.72rem; font-weight: 750; letter-spacing: 0.06em; }
   .ledger-merchant { min-width: 0; }
-  .ledger-table td.ledger-mobile-merchant { display: block; padding: 0 0 0.85rem; }
+  .ledger-table td.ledger-mobile-merchant { display: block; padding: 0 0 0.6rem; }
   .ledger-table td.ledger-mobile-merchant::before { display: none; }
   .ledger-merchant-title { font-size: 1rem; line-height: 1.3; }
   .transaction-category-control { width: 100%; }
   .ledger-merchant-title { white-space: normal; }
   .ledger-merchant-source-line { align-items: center; flex-direction: row; flex-wrap: wrap; gap: 0.4rem; }
   .transaction-account-label, .split-summary { height: auto; overflow: visible; white-space: normal; }
+  .split-summary.is-empty { display: none; }
   .ledger-inline-form { min-width: 0; width: 100%; }
   .ledger-inline-form select, .ledger-inline-form input, .transaction-category-control select { height: 2.75rem; }
-  .ledger-table td.ledger-review-cell { border-top: 1px solid var(--border); margin-top: 0.6rem; padding-top: 0.85rem; }
+  .ledger-table td.ledger-review-cell { border-top: 1px solid var(--border); margin-top: 0.4rem; padding-top: 0.6rem; }
   .ledger-actions { align-items: center; flex-wrap: wrap; min-width: 0; }
   .ledger-actions .ledger-button, .ledger-actions .transaction-reviewed-toggle { min-height: 2.75rem; }
+  .ledger-actions .ledger-button, .status-label { font-size: 0.78rem; }
   .reimbursement-row { align-items: start; grid-template-columns: 1fr; }
   .reimbursement-amounts { max-width: 26rem; }
   .settings-row { align-items: flex-start; flex-direction: column; }

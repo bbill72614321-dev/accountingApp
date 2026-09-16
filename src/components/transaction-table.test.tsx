@@ -38,5 +38,6 @@ describe('TransactionTable', () => {
     expect(html).toContain('ledger-status-column')
     expect(html).toContain('ledger-mobile-merchant')
     expect(html).toContain('ledger-review-cell')
+    expect(html).toContain('split-summary is-empty')
   })
 })

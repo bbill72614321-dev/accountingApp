@@ -63,6 +63,9 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             })
             const amount = `${row.amount_cents < 0 ? '−' : '+'}${formatUsd(Math.abs(row.amount_cents), language)}`
             const reportDisposition = transactionReportDisposition({ included: row.include_in_report, excluded: row.excluded_from_report })
+            const splitSummary = row.transaction_split && shouldTrackReimbursement(
+              Math.abs(row.amount_cents), row.transaction_split.personal_amount_cents,
+            ) ? `${dictionary.yourShare}: ${formatUsd(row.transaction_split.personal_amount_cents, language)}` : null
             return (
               <tr className={reportDisposition === 'excluded' ? 'ledger-row-resolved' : undefined} key={row.id}>
                 <td className="ledger-merchant ledger-mobile-merchant" data-label={dictionary.merchant}>
@@ -72,10 +75,8 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                       <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
                       <span className="transaction-account-label">{row.bank_account ? `${row.bank_account.name}${row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}` : '\u00a0'}</span>
                     </span>
-                    <span className="split-summary">
-                      {row.transaction_split && shouldTrackReimbursement(Math.abs(row.amount_cents), row.transaction_split.personal_amount_cents)
-                        ? `${dictionary.yourShare}: ${formatUsd(row.transaction_split.personal_amount_cents, language)}`
-                        : '\u00a0'}
+                    <span className={`split-summary${splitSummary ? '' : ' is-empty'}`}>
+                      {splitSummary ?? '\u00a0'}
                     </span>
                   </span>
                 </td>
