@@ -172,7 +172,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .ledger-review-form { min-width: 0; }
 .ledger-review-form .status-label { margin-top: 0; }
 .ledger-actions { align-items: center; display: flex; flex-wrap: nowrap; font-size: 0.75rem; gap: 0.5rem; min-width: 19rem; }
-.ledger-actions form { display: flex; }
+.ledger-actions > form { display: flex; }
 .ledger-delete { color: var(--danger) !important; }
 .split-dialog { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 0.75rem; color: var(--foreground); inset: 0; margin: auto; padding: 0; width: min(32rem, calc(100vw - 2rem)); }
 .split-dialog::backdrop { background: rgb(4 7 11 / 72%); }
