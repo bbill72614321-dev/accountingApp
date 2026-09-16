@@ -16,10 +16,10 @@ describe('mobile split payment dialog', () => {
   it('keeps split fields readable without widening or zooming the viewport', () => {
     const mobileStyles = styles.split('@media (max-width: 760px) {')[1]?.split('@media (prefers-reduced-motion: reduce)')[0]
 
-    expect(mobileStyles).toContain('.split-dialog { max-height: calc(100dvh - 2.5rem); width: calc(100vw - 2.5rem); }')
-    expect(mobileStyles).toContain('.split-form { gap: 0.75rem; max-height: calc(100dvh - 1.5rem); overflow-y: auto; padding: 1rem; }')
+    expect(mobileStyles).toContain('.split-dialog { display: flex; height: min(31rem, calc(100dvh - 2.5rem)); max-height: calc(100dvh - 2.5rem); width: calc(100vw - 2.5rem); }')
+    expect(mobileStyles).toContain('.split-form { display: flex; flex: 1; flex-direction: column; gap: 0.75rem; min-height: 0; overflow-y: auto; padding: 1rem; }')
     expect(mobileStyles).toContain('.split-form input { appearance: textfield; font-size: 16px; height: 3rem; line-height: 1.25; min-height: 3rem; }')
-    expect(mobileStyles).toContain('.split-actions { justify-content: stretch; margin-top: 1rem; }')
+    expect(mobileStyles).toContain('.split-actions { background: var(--surface); bottom: 0; justify-content: stretch; margin-top: auto; padding-top: 1rem; position: sticky; }')
     expect(mobileStyles).toContain('.split-actions .button { flex: 1; min-height: 2.75rem; }')
   })
 })
