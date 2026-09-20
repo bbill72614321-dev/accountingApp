@@ -23,6 +23,7 @@ describe('TransactionTable', () => {
           source_category: null, category_override: null, transaction_date: '2026-09-12',
           amount_cents: -1250, note: '', include_in_report: true, excluded_from_report: false,
           source: 'plaid', pending: false, provider_pending: false, review_status: 'needs_review',
+          bank_account: { name: 'Bank original name', mask: '1234', display_name: 'Chase 日常卡' },
         }]}
       />,
     )
@@ -30,6 +31,8 @@ describe('TransactionTable', () => {
     expect(html).toContain('請選擇分類')
     expect(html).toContain('已看過')
     expect(html).toContain('略過')
+    expect(html).toContain('Chase 日常卡 · 1234')
+    expect(html).not.toContain('Bank original name')
     expect(html).toContain('data-auto-category="true"')
     expect(html).toContain('ledger-merchant-details')
     expect(html).toContain('ledger-merchant-column')

@@ -1,4 +1,5 @@
 import { deleteMerchantRule } from '@/app/actions/transactions'
+import { AccountNameForm } from '@/components/account-name-form'
 import { CATEGORY_LABELS, type Category } from '@/features/transactions/categories'
 import { requireUser } from '@/lib/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -12,10 +13,22 @@ export default async function SettingsPage() {
   const { data: rules, error } = await supabase.from('merchant_rules').select('id, normalized_merchant, category')
     .eq('user_id', user.id).order('normalized_merchant')
   if (error) throw new Error('Unable to load merchant rules')
+  const { data: accounts, error: accountsError } = await supabase.from('bank_accounts')
+    .select('id, name, mask, display_name').eq('user_id', user.id).order('name').order('id')
+  if (accountsError) throw new Error('Unable to load bank accounts')
 
   return (
     <>
       <h1 className="mb-4 text-2xl font-semibold">{dictionary.settings}</h1>
+      <section className="account-name-settings">
+        <h2 className="mb-2 text-lg font-medium">{dictionary.accountNames}</h2>
+        <p className="muted">{dictionary.accountNameHelp}</p>
+        {!accounts?.length ? <p>{dictionary.noBankConnections}</p> : (
+          <div className="grid gap-2">
+            {accounts.map((account) => <AccountNameForm key={account.id} account={account} dictionary={dictionary} />)}
+          </div>
+        )}
+      </section>
       <h2 className="mb-2 text-lg font-medium">{dictionary.merchantRules}</h2>
       {!rules?.length ? <p>{dictionary.noMerchantRules}</p> : (
         <ul className="grid gap-2">

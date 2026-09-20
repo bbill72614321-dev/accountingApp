@@ -3,6 +3,7 @@ import type { Language } from '@/features/transactions/categories'
 import { createServerClient } from '@/lib/supabase/server'
 
 export type Dictionary = {
+  accountNames: string; accountDisplayName: string; accountNameHelp: string; accountNameSaved: string; accountNameError: string
   login: string; email: string; password: string; forgotPassword: string
   sendResetLink: string; resetPassword: string; confirmPassword: string
   dashboard: string; transactions: string; bankConnections: string; settings: string; merchant: string; category: string
@@ -31,6 +32,7 @@ export type Dictionary = {
 
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
+    accountNames: 'Account names', accountDisplayName: 'Display name', accountNameHelp: 'Up to 60 characters. Leave blank to use the bank name. Changes apply to existing and future transactions.', accountNameSaved: 'Name saved.', accountNameError: 'Unable to save. Use up to 60 characters and try again.',
     login: 'Sign in', email: 'Email', password: 'Password', forgotPassword: 'Forgot password?',
     sendResetLink: 'Send reset link', resetPassword: 'Reset password', confirmPassword: 'Confirm password',
     dashboard: 'Dashboard', transactions: 'Transactions', bankConnections: 'Bank connections', settings: 'Settings', merchant: 'Merchant', category: 'Category',
@@ -62,6 +64,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     allTransactions: 'All transactions', unreviewedTransactions: 'Not reviewed',
   },
   'zh-TW': {
+    accountNames: '帳戶顯示名稱', accountDisplayName: '自訂名稱', accountNameHelp: '最多 60 字，留空則使用銀行原名。修改會套用到此帳戶的新舊交易。', accountNameSaved: '名稱已儲存。', accountNameError: '無法儲存，請確認名稱不超過 60 字後重試。',
     login: '登入', email: '電子郵件', password: '密碼', forgotPassword: '忘記密碼？',
     sendResetLink: '寄送重設連結', resetPassword: '重設密碼', confirmPassword: '確認密碼',
     dashboard: '每月結算', transactions: '交易紀錄', bankConnections: '銀行連線', settings: '設定', merchant: '商家', category: '分類',

@@ -31,6 +31,7 @@ export type TransactionRow = {
   user_reviewed_at?: string | null
   bank_account?: {
     name: string
+    display_name?: string | null
     mask: string | null
   } | null
   transaction_split?: {
@@ -73,7 +74,7 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
                   <span className="ledger-merchant-details">
                     <span className="ledger-merchant-source-line">
                       <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
-                      <span className="transaction-account-label">{row.bank_account ? `${row.bank_account.name}${row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}` : '\u00a0'}</span>
+                      <span className="transaction-account-label">{row.bank_account ? `${row.bank_account.display_name || row.bank_account.name}${row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}` : '\u00a0'}</span>
                     </span>
                     <span className={`split-summary${splitSummary ? '' : ' is-empty'}`}>
                       {splitSummary ?? '\u00a0'}
