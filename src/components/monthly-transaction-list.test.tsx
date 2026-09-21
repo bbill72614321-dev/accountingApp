@@ -24,6 +24,8 @@ describe('MonthlyTransactionList', () => {
     expect(html).toContain('<button')
     expect(html).toContain('全部交易')
     expect(html).toContain('未審核')
+    expect(html).toContain('type="search"')
+    expect(html).toContain('商家名稱或備註')
     expect(html).not.toContain('href=')
   })
 })
