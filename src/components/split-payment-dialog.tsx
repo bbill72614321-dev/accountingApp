@@ -52,9 +52,22 @@ export function SplitPaymentDialog({
     })
   }
 
+  function unsplit() {
+    const formData = new FormData()
+    formData.set('transaction_id', transactionId)
+    formData.set('split_count', '2')
+    formData.set('personal_amount', dollars(totalAmountCents))
+    submit(formData)
+  }
+
   return (
     <>
-      <button className="ledger-button" onClick={() => dialog.current?.showModal()} type="button">{dictionary.split}</button>
+      <button className="ledger-button" onClick={() => {
+        setSplitCount(split?.split_count ?? 2)
+        setPersonalAmount(dollars(split?.personal_amount_cents ?? defaultPersonalShareCents(amountCents, 2)))
+        setState({ status: 'idle', message: '' })
+        dialog.current?.showModal()
+      }} type="button">{dictionary.split}</button>
       <dialog aria-labelledby={`split-title-${transactionId}`} className="split-dialog" ref={dialog}>
         <form action={submit} className="split-form">
           <input name="transaction_id" type="hidden" value={transactionId} />
@@ -72,6 +85,7 @@ export function SplitPaymentDialog({
           </label>
           <p className="split-owed">{dictionary.amountOwed}: <strong>${dollars(Math.max(0, owedCents))}</strong></p>
           {state.status === 'error' && <p className="split-error" role="alert">{dictionary[state.message as 'invalidSplit' | 'saveSplitFailed']}</p>}
+          {split && <button className="button" disabled={isPending} onClick={unsplit} type="button">{dictionary.unsplit}</button>}
           <div className="split-actions">
             <button className="button" onClick={() => dialog.current?.close()} type="button">{dictionary.cancel}</button>
             <button className="button button-primary" disabled={isPending} type="submit">{dictionary.save}</button>

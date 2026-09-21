@@ -23,7 +23,7 @@ export type Dictionary = {
   downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; allCategories: string; withoutHome: string; transactionDetails: string
   connectBank: string; bankConnectionsDescription: string; noBankConnections: string
   disconnectBank: string; disconnectBankConfirmation: string; disconnectBankError: string
-  reimbursements: string; split: string; splitPayment: string; splitCount: string; yourShare: string; amountOwed: string
+  reimbursements: string; split: string; unsplit: string; splitPayment: string; splitCount: string; yourShare: string; amountOwed: string
   requestSent: string; markRequested: string; noReimbursements: string; totalCharged: string; invalidSplit: string; saveSplitFailed: string; cancel: string; people: string
   skipFromReport: string; undoSkip: string; skipped: string
   uncategorized: string; review: string; markReviewed: string
@@ -56,7 +56,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     categorySummary: 'Category summary', allCategories: 'All categories', withoutHome: 'Without Home', transactionDetails: 'Transaction details',
     connectBank: 'Connect bank', bankConnectionsDescription: 'Connected accounts stay private to this login.', noBankConnections: 'No bank connections yet.',
     disconnectBank: 'Disconnect and delete data', disconnectBankConfirmation: 'Disconnect {institution} and permanently delete its imported data? This cannot be undone.', disconnectBankError: 'Unable to remove this bank connection.',
-    reimbursements: 'Reimbursements', split: 'Split', splitPayment: 'Split payment', splitCount: 'People splitting', yourShare: 'Your share',
+    reimbursements: 'Reimbursements', split: 'Split', unsplit: 'Unsplit', splitPayment: 'Split payment', splitCount: 'People splitting', yourShare: 'Your share',
     amountOwed: 'Amount owed', requestSent: 'Requested', markRequested: 'Mark requested', noReimbursements: 'No split payments for this month.', totalCharged: 'Total charged',
     invalidSplit: 'Enter a valid personal share for this outgoing transaction.', saveSplitFailed: 'Unable to save the split payment.', cancel: 'Cancel', people: 'people',
     skipFromReport: 'Skip', undoSkip: 'Undo skip', skipped: 'Skipped',
@@ -88,7 +88,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     categorySummary: '分類結算', allCategories: '全部分類', withoutHome: '不含居家', transactionDetails: '交易明細',
     connectBank: '連接銀行', bankConnectionsDescription: '連線帳戶只會屬於目前登入者。', noBankConnections: '尚未連接銀行帳戶。',
     disconnectBank: '解除並刪除資料', disconnectBankConfirmation: '要解除 {institution} 並永久刪除其匯入資料嗎？此操作無法復原。', disconnectBankError: '無法解除此銀行連線。',
-    reimbursements: '代墊', split: '拆分', splitPayment: '拆分交易', splitCount: '共幾人分', yourShare: '我實際負擔',
+    reimbursements: '代墊', split: '拆分', unsplit: '取消拆分', splitPayment: '拆分交易', splitCount: '共幾人分', yourShare: '我實際負擔',
     amountOwed: '尚待收回', requestSent: '已請款', markRequested: '標記已請款', noReimbursements: '這個月份沒有代墊交易。', totalCharged: '原交易金額',
     invalidSplit: '請為這筆支出輸入有效的個人負擔金額。', saveSplitFailed: '無法儲存拆分交易。', cancel: '取消', people: '人分',
     skipFromReport: '略過', undoSkip: '取消略過', skipped: '已略過',

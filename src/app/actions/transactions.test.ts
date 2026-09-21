@@ -15,7 +15,32 @@ import {
   setTransactionReviewed,
   updateManualTransaction,
   updateTransactionCategory,
+  saveTransactionSplit,
 } from './transactions'
+
+describe('removing a split with the full personal share', () => {
+  it('deletes only the current user split without updating the transaction', async () => {
+    const byUser = vi.fn(async () => ({ error: null }))
+    const byTransaction = vi.fn(() => ({ eq: byUser }))
+    const remove = vi.fn(() => ({ eq: byTransaction }))
+    const query = {
+      select: vi.fn(() => query),
+      eq: vi.fn(() => query),
+      maybeSingle: vi.fn(async () => ({ data: { amount_cents: -12000 }, error: null })),
+    }
+    const from = vi.fn((table: string) => table === 'transactions' ? query : { delete: remove })
+    createServerClient.mockResolvedValue({ from })
+    const data = new FormData()
+    data.set('transaction_id', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa')
+    data.set('split_count', '2')
+    data.set('personal_amount', '120.00')
+    expect(await saveTransactionSplit(data)).toEqual({ status: 'success', message: '' })
+    expect(byTransaction).toHaveBeenCalledWith('transaction_id', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa')
+    expect(byUser).toHaveBeenCalledWith('user_id', 'user-1')
+    expect(query.eq).toHaveBeenCalledWith('user_id', 'user-1')
+    expect(from.mock.calls).toEqual([['transactions'], ['transaction_splits']])
+  })
+})
 
 describe('transaction action messages', () => {
   it('returns a dictionary key for invalid manual transaction fields', async () => {
