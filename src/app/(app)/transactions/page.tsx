@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { z } from 'zod'
 import { MonthNavigator } from '@/components/month-navigator'
-import { TransactionTable, type TransactionRow } from '@/components/transaction-table'
+import { type TransactionRow } from '@/components/transaction-table'
+import { SearchableTransactionList } from '@/components/searchable-transaction-list'
 import { CATEGORIES, CATEGORY_LABELS } from '@/features/transactions/categories'
 import { effectiveCategoryFilter, type CategoryFilter } from '@/features/transactions/merchant-rule'
 import { compareTransactionDisplayOrder } from '@/features/transactions/display-order'
@@ -22,9 +23,9 @@ export default async function TransactionsPage({
   searchParams,
 }: { searchParams: Promise<{ month?: string; category?: string }> }) {
   const { month: rawMonth, category: rawCategory } = await searchParams
-  const month = monthSchema.safeParse(rawMonth).data
-  const category = z.union([z.enum(CATEGORIES), z.literal('Uncategorized')]).safeParse(rawCategory).data as CategoryFilter | undefined
   const homeMonth = new Date().toISOString().slice(0, 7)
+  const month = monthSchema.safeParse(rawMonth).data ?? homeMonth
+  const category = z.union([z.enum(CATEGORIES), z.literal('Uncategorized')]).safeParse(rawCategory).data as CategoryFilter | undefined
   const user = await requireUser()
   const language = await getLanguage()
   const dictionary = getDictionary(language)
@@ -57,11 +58,10 @@ export default async function TransactionsPage({
       <div className="page-heading">
         <div>
           <h1>{dictionary.transactions}</h1>
-          <p className="muted">{rows.length} {dictionary.results}</p>
         </div>
         <Link className="button button-primary" href="/transactions/new">+ {dictionary.newTransaction}</Link>
       </div>
-      <div className="transaction-filter-row">
+      <SearchableTransactionList dictionary={dictionary} language={language} rows={rows}>
         <MonthNavigator currentMonth={month ?? homeMonth} homeMonth={homeMonth} labels={{ current: dictionary.currentMonth, month: dictionary.month, previous: dictionary.previousMonth, next: dictionary.nextMonth }} language={language} months={months} path="/transactions" query={category ? { category } : {}} />
         <form className="category-filter" method="get">
           {month && <input name="month" type="hidden" value={month} />}
@@ -76,8 +76,7 @@ export default async function TransactionsPage({
         <button className="button" type="submit">{dictionary.filters}</button>
         {hasFilters && <Link className="button" href="/transactions">{dictionary.clearFilters}</Link>}
         </form>
-      </div>
-      {rows.length === 0 ? <p className="ledger-empty">{hasFilters ? dictionary.noFilteredTransactions : dictionary.noTransactions}</p> : <TransactionTable dictionary={dictionary} language={language} rows={rows} />}
+      </SearchableTransactionList>
     </section>
   )
 }

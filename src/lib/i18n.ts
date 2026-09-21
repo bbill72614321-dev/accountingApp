@@ -12,6 +12,7 @@ export type Dictionary = {
   spentThisMonth: string; needsReview: string; bankPending: string; status: string; currentMonth: string; previousMonth: string; nextMonth: string; confirm: string; ready: string; manual: string; imported: string
   clearFilters: string; results: string; noFilteredTransactions: string
   month: string; search: string; language: string; signOut: string
+  searchMerchantNotes: string; searchOriginalSpending: string; searchTotalsHint: string
   noTransactions: string; noCategorySpending: string; noSpendingCategory: string; chooseCategory: string
   included: string; excluded: string; includeInReport: string; excludeFromReport: string; edit: string; delete: string
   deleteConfirmation: string
@@ -41,6 +42,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     spentThisMonth: 'Spent this month', needsReview: 'Needs review', bankPending: 'Bank pending', status: 'Status', currentMonth: 'Current month', previousMonth: 'Previous month', nextMonth: 'Next month', confirm: 'Confirm', ready: 'Ready', manual: 'Manual', imported: 'Imported',
     clearFilters: 'Clear filters', results: 'results', noFilteredTransactions: 'No transactions match these filters.',
     month: 'Month', search: 'Search', language: 'Language', signOut: 'Sign out',
+    searchMerchantNotes: 'Merchant or notes', searchOriginalSpending: 'Original spending', searchTotalsHint: 'Search totals include skipped and pending expenses, exclude incoming payments/refunds, and are not monthly report totals.',
     noTransactions: 'No transactions found.', noCategorySpending: 'No category spending this month.',
     noSpendingCategory: 'Income / no spending category', chooseCategory: 'Choose a category',
     included: 'Included', excluded: 'Excluded', includeInReport: 'Include in report', excludeFromReport: 'Exclude from report', edit: 'Edit', delete: 'Delete',
@@ -73,6 +75,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     spentThisMonth: '本月支出', needsReview: '待確認', bankPending: '銀行待入帳', status: '狀態', currentMonth: '本月', previousMonth: '上個月', nextMonth: '下個月', confirm: '確認', ready: '已確認', manual: '手動輸入', imported: '匯入',
     clearFilters: '清除篩選', results: '筆結果', noFilteredTransactions: '沒有符合這些篩選條件的交易紀錄。',
     month: '月份', search: '搜尋', language: '語言', signOut: '登出',
+    searchMerchantNotes: '商家名稱或備註', searchOriginalSpending: '原始消費合計', searchTotalsHint: '搜尋合計包含已略過及待入帳支出，不扣除收入／退款，並非月結金額。',
     noTransactions: '找不到交易紀錄。', noCategorySpending: '本月尚無分類支出。',
     noSpendingCategory: '收入／不列支出分類', chooseCategory: '請選擇分類',
     included: '列入結算', excluded: '不列入結算', includeInReport: '列入結算', excludeFromReport: '不列入結算', edit: '編輯', delete: '刪除',
