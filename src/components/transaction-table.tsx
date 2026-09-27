@@ -70,11 +70,11 @@ export function TransactionTable({ rows, language = 'en', dictionary }: { rows: 
             return (
               <tr className={reportDisposition === 'excluded' ? 'ledger-row-resolved' : undefined} key={row.id}>
                 <td className="ledger-merchant ledger-mobile-merchant" data-label={dictionary.merchant}>
-                  <strong className="ledger-merchant-title">{row.raw_description || '—'}</strong>
+                  <strong className="ledger-merchant-title" tabIndex={0} title={row.raw_description || undefined}>{row.raw_description || '—'}</strong>
                   <span className="ledger-merchant-details">
                     <span className="ledger-merchant-source-line">
                       <span className="source-label">{dictionary[transactionSourceLabel(row.source)]}</span>
-                      <span className="transaction-account-label">{row.bank_account ? `${row.bank_account.display_name || row.bank_account.name}${row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}` : '\u00a0'}</span>
+                      <span className="transaction-account-label" tabIndex={row.bank_account ? 0 : undefined}>{row.bank_account ? `${row.bank_account.display_name || row.bank_account.name}${row.bank_account.mask ? ` · ${row.bank_account.mask}` : ''}` : '\u00a0'}</span>
                     </span>
                     <span className={`split-summary${splitSummary ? '' : ' is-empty'}`}>
                       {splitSummary ?? '\u00a0'}
