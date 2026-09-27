@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import type { Dictionary } from '@/lib/i18n'
 import { isCurrentNavigationPath } from '@/lib/ui-state'
 
@@ -15,10 +15,12 @@ const links = [
 
 export function AppNav({ dictionary }: { dictionary: Dictionary }) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const selectedMonth = searchParams.get('month')
   return (
     <nav aria-label="Main navigation" className="app-nav">
       {links.map((link) => (
-        <Link aria-current={isCurrentNavigationPath(pathname, link.href) ? 'page' : undefined} className={`app-nav-link ${isCurrentNavigationPath(pathname, link.href) ? 'is-active' : ''}`} href={link.href} key={link.href}>
+        <Link aria-current={isCurrentNavigationPath(pathname, link.href) ? 'page' : undefined} className={`app-nav-link ${isCurrentNavigationPath(pathname, link.href) ? 'is-active' : ''}`} href={selectedMonth && ['/dashboard', '/transactions'].includes(link.href) ? `${link.href}?month=${encodeURIComponent(selectedMonth)}` : link.href} key={link.href}>
           {dictionary[link.key]}
         </Link>
       ))}
