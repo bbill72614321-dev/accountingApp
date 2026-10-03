@@ -20,7 +20,7 @@ export function AppNav({ dictionary }: { dictionary: Dictionary }) {
   return (
     <nav aria-label="Main navigation" className="app-nav">
       {links.map((link) => (
-        <Link aria-current={isCurrentNavigationPath(pathname, link.href) ? 'page' : undefined} className={`app-nav-link ${isCurrentNavigationPath(pathname, link.href) ? 'is-active' : ''}`} href={selectedMonth && ['/dashboard', '/transactions'].includes(link.href) ? `${link.href}?month=${encodeURIComponent(selectedMonth)}` : link.href} key={link.href}>
+        <Link aria-current={isCurrentNavigationPath(pathname, link.href) ? 'page' : undefined} className={`app-nav-link ${isCurrentNavigationPath(pathname, link.href) ? 'is-active' : ''}`} href={selectedMonth && ['/dashboard', '/transactions', '/reimbursements'].includes(link.href) ? `${link.href}?month=${encodeURIComponent(selectedMonth)}` : link.href} key={link.href}>
           {dictionary[link.key]}
         </Link>
       ))}
