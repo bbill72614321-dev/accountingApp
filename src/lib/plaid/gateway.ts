@@ -8,6 +8,17 @@ export function createPlaidGateway(client: PlaidApi): PlaidGateway {
     async removeItem({ accessToken }) {
       await client.itemRemove({ access_token: accessToken })
     },
+    async getAccounts({ accessToken }) {
+      const { data } = await client.accountsGet({ access_token: accessToken })
+      return data.accounts.map((account) => ({
+        accountId: account.account_id,
+        name: account.name,
+        officialName: account.official_name,
+        mask: account.mask,
+        type: account.type,
+        subtype: account.subtype,
+      }))
+    },
     async syncTransactions({ accessToken, cursor }) {
       const { data } = await client.transactionsSync({
         access_token: accessToken,

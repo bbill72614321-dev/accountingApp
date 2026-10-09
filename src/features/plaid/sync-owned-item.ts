@@ -17,7 +17,17 @@ export type PlaidSyncPage = {
   hasMore: boolean
 }
 
+export type PlaidProviderAccount = {
+  accountId: string
+  name: string
+  officialName: string | null
+  mask: string | null
+  type: string
+  subtype: string | null
+}
+
 export type PlaidGateway = PlaidItemRemovalGateway & {
+  getAccounts(input: { accessToken: string }): Promise<PlaidProviderAccount[]>
   syncTransactions(input: { accessToken: string; cursor: string | null }): Promise<PlaidSyncPage>
 }
 
@@ -37,7 +47,7 @@ export type ImportedTransaction = {
 
 export type PlaidSyncRepository = {
   findOwnedItem(userId: string, itemId: string): Promise<{ accessToken: string; cursor: string | null } | null>
-  upsertAccounts(itemId: string, accounts: unknown[]): Promise<void>
+  upsertAccounts(userId: string, itemId: string, accounts: PlaidProviderAccount[]): Promise<void>
   upsertTransactions(rows: ImportedTransaction[]): Promise<void>
   removeTransactions(userId: string, itemId: string, externalIds: string[]): Promise<void>
   updateCursor(itemId: string, cursor: string): Promise<void>
@@ -73,6 +83,9 @@ export async function syncOwnedItem({
 }) {
   const item = await repository.findOwnedItem(userId, itemId)
   if (!item) throw new Error('Not found')
+
+  const accounts = await gateway.getAccounts({ accessToken: item.accessToken })
+  await repository.upsertAccounts(userId, itemId, accounts)
 
   let cursor = item.cursor
   let hasMore: boolean

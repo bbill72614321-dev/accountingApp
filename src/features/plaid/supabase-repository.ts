@@ -19,7 +19,20 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
         accessToken: decryptAccessToken({ ciphertext: secret.access_token_ciphertext, iv: secret.access_token_iv, tag: secret.access_token_tag }),
       }
     },
-    async upsertAccounts() {},
+    async upsertAccounts(userId, itemId, accounts) {
+      if (accounts.length === 0) return
+      const { error } = await admin.from('bank_accounts').upsert(accounts.map((account) => ({
+        user_id: userId,
+        bank_item_id: itemId,
+        plaid_account_id: account.accountId,
+        name: account.name,
+        official_name: account.officialName,
+        mask: account.mask,
+        type: account.type,
+        subtype: account.subtype,
+      })), { onConflict: 'plaid_account_id' })
+      if (error) throw new Error('Unable to save linked bank accounts')
+    },
     async upsertTransactions(rows) {
       if (rows.length === 0) return
       const firstRow = rows[0]

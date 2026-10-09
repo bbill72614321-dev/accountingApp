@@ -206,6 +206,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .settings-row > div span, .settings-row > div small { color: var(--muted); }
 .settings-row-actions { align-items: center; display: flex; gap: 0.5rem; }
 .settings-row-actions p { color: var(--danger); font-size: 0.78rem; margin: 0; }
+.bank-access-action { display: grid; gap: 0.35rem; }
+.settings-row-actions .bank-access-success { color: var(--success); }
+.settings-row-actions .bank-access-error { color: var(--danger); }
 .account-name-settings { margin-bottom: 2rem; }
 .account-name-settings > p { margin-bottom: 1rem; }
 .account-name-form { background: var(--surface); border: 1px solid var(--border); border-radius: 0.65rem; display: grid; gap: 0.5rem; max-width: 36rem; padding: 1rem; }

@@ -21,20 +21,23 @@ function createRepository(): PlaidSyncRepository & {
   transactions: ImportedTransaction[]
   cursors: string[]
   removals: Array<{ userId: string; itemId: string; externalIds: string[] }>
+  savedAccounts: string[]
 } {
   const transactions: ImportedTransaction[] = []
   const cursors: string[] = []
   const removals: Array<{ userId: string; itemId: string; externalIds: string[] }> = []
+  const savedAccounts: string[] = []
   return {
     transactions,
     cursors,
     removals,
+    savedAccounts,
     async findOwnedItem(userId, itemId) {
       return userId === 'user-a' && itemId === 'item-a'
         ? { accessToken: 'encrypted-token', cursor: null }
         : null
     },
-    async upsertAccounts() {},
+    async upsertAccounts(_userId, _itemId, accounts) { savedAccounts.push(...accounts.map((account) => account.accountId)) },
     async upsertTransactions(rows) {
       for (const row of rows) {
         const index = transactions.findIndex((candidate) => candidate.externalId === row.externalId)
@@ -49,12 +52,27 @@ function createRepository(): PlaidSyncRepository & {
 
 const gateway: PlaidGateway = {
   async removeItem() {},
+  async getAccounts() { return [{ accountId: 'account-1', name: 'Credit card', officialName: null, mask: '1234', type: 'credit', subtype: 'credit card' }] },
   async syncTransactions() {
     return { added: [transaction], modified: [], removed: [], nextCursor: 'cursor-1', hasMore: false }
   },
 }
 
 describe('syncOwnedItem', () => {
+  it('saves the newly shared account before importing its transactions', async () => {
+    const repository = createRepository()
+    const events: string[] = []
+    const saveAccounts = repository.upsertAccounts
+    const saveTransactions = repository.upsertTransactions
+    repository.upsertAccounts = async (userId, itemId, accounts) => { events.push('accounts'); await saveAccounts(userId, itemId, accounts) }
+    repository.upsertTransactions = async (rows) => { events.push('transactions'); await saveTransactions(rows) }
+
+    await syncOwnedItem({ userId: 'user-a', itemId: 'item-a', gateway, repository })
+
+    expect(repository.savedAccounts).toEqual(['account-1'])
+    expect(events).toEqual(['accounts', 'transactions'])
+  })
+
   it('upserts imported transactions once across repeated cursor syncs', async () => {
     const repository = createRepository()
 
@@ -78,6 +96,7 @@ describe('syncOwnedItem', () => {
     const repository = createRepository()
     const paginatedGateway: PlaidGateway = {
       async removeItem() {},
+      async getAccounts() { return [] },
       async syncTransactions({ cursor }) {
         if (!cursor) return { added: [transaction], modified: [], removed: [], nextCursor: 'cursor-page-2', hasMore: true }
         return {
@@ -98,6 +117,7 @@ it('scopes provider removals to the synced item', async () => {
   const repository = createRepository()
   const removalGateway: PlaidGateway = {
     async removeItem() {},
+    async getAccounts() { return [] },
     async syncTransactions() {
       return { added: [], modified: [], removed: [{ transactionId: 'transaction-1' }], nextCursor: 'cursor-1', hasMore: false }
     },
