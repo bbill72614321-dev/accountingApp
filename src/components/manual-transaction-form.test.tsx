@@ -15,4 +15,16 @@ describe('ManualTransactionForm', () => {
     expect(html).toContain('href="/transactions"')
     expect(html).toContain('取消')
   })
+
+  it('starts an income transaction without a spending category', () => {
+    const html = renderToStaticMarkup(
+      <ManualTransactionForm
+        action={async () => ({ status: 'idle', message: '' })}
+        labels={dictionaries['zh-TW']}
+        values={{ type: 'income' }}
+      />,
+    )
+
+    expect(html).toMatch(/<option value=""[^>]*selected/)
+  })
 })

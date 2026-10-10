@@ -49,6 +49,34 @@ describe('transaction action messages', () => {
     expect(result.message).toBe('invalidTransaction')
     expect(dictionaries['zh-TW'].invalidTransaction).toBe('請檢查交易欄位後再試。')
   })
+
+  it('identifies an invalid amount instead of returning the generic error', async () => {
+    const formData = new FormData()
+    formData.set('merchant', 'Store')
+    formData.set('category', 'Grocery')
+    formData.set('date', '2026-10-09')
+    formData.set('type', 'expense')
+    formData.set('amount', '34.775')
+    formData.set('note', '')
+
+    const result = await createManualTransaction({ status: 'idle', message: '' }, formData)
+
+    expect(result).toEqual({ status: 'error', message: 'invalidAmount' })
+  })
+
+  it('identifies a spending category on income as the invalid field', async () => {
+    const formData = new FormData()
+    formData.set('merchant', 'Refund')
+    formData.set('category', 'Other')
+    formData.set('date', '2026-10-09')
+    formData.set('type', 'income')
+    formData.set('amount', '12.34')
+    formData.set('note', '')
+
+    const result = await createManualTransaction({ status: 'idle', message: '' }, formData)
+
+    expect(result).toEqual({ status: 'error', message: 'invalidCategory' })
+  })
 })
 
 describe('updateManualTransaction', () => {

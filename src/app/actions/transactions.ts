@@ -51,6 +51,15 @@ function manualFields(formData: FormData) {
   }
 }
 
+function manualValidationMessage(error: z.ZodError) {
+  if (error.issues.length !== 1) return 'invalidTransaction'
+  const field = error.issues[0].path[0]
+  if (field === 'amount') return 'invalidAmount'
+  if (field === 'category') return 'invalidCategory'
+  if (field === 'date') return 'invalidDate'
+  return 'invalidTransaction'
+}
+
 function revalidateLedger() {
   revalidatePath('/transactions')
   revalidatePath('/reimbursements')
@@ -65,7 +74,7 @@ export async function createManualTransaction(
 ): Promise<ActionState> {
   const user = await requireUser()
   const parsed = manualTransactionSchema.safeParse(manualFields(formData))
-  if (!parsed.success) return { status: 'error', message: 'invalidTransaction' }
+  if (!parsed.success) return { status: 'error', message: manualValidationMessage(parsed.error) }
 
   const supabase = await createServerClient()
   const { merchant, category, date, amount, note } = parsed.data
@@ -90,7 +99,7 @@ export async function updateManualTransaction(
   await requireUser()
   const id = transactionIdSchema.safeParse(formData.get('transaction_id'))
   const parsed = manualTransactionSchema.safeParse(manualFields(formData))
-  if (!id.success || !parsed.success) return { status: 'error', message: 'invalidTransaction' }
+  if (!id.success || !parsed.success) return { status: 'error', message: parsed.success ? 'invalidTransaction' : manualValidationMessage(parsed.error) }
 
   const supabase = await createServerClient()
   const { merchant, category, date, amount, note } = parsed.data

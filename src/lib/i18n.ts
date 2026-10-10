@@ -18,7 +18,7 @@ export type Dictionary = {
   deleteConfirmation: string
   merchantRules: string; noMerchantRules: string
   traditionalChinese: string; english: string
-  invalidTransaction: string; saveTransactionFailed: string; updateTransactionFailed: string
+  invalidTransaction: string; invalidAmount: string; invalidCategory: string; invalidDate: string; saveTransactionFailed: string; updateTransactionFailed: string
   invalidLogin: string; resetSent: string; updateFailed: string; updateLanguageFailed: string
   recoveryExpired: string; passwordUpdated: string; personalFinanceDescription: string
   downloadExcel: string; savePdf: string; monthlySummary: string; categorySummary: string; allCategories: string; withoutHome: string; transactionDetails: string
@@ -51,6 +51,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     merchantRules: 'Merchant rules', noMerchantRules: 'No merchant rules yet.', invalidLogin: 'Unable to sign in.',
     traditionalChinese: 'Traditional Chinese', english: 'English',
     invalidTransaction: 'Check the transaction fields and try again.',
+    invalidAmount: 'Enter a USD amount with at most two decimal places, like 34.75. Do not include $ or commas.', invalidCategory: 'Choose a category for spending; income must have no spending category.', invalidDate: 'Choose a valid date.',
     saveTransactionFailed: 'Unable to save the transaction.', updateTransactionFailed: 'Unable to update the transaction.',
     resetSent: 'If the account exists, a reset link has been sent.', updateFailed: 'Unable to update password.', updateLanguageFailed: 'Unable to update language. Try again.',
     recoveryExpired: 'Recovery session expired.', passwordUpdated: 'Password updated.',
@@ -85,6 +86,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     merchantRules: '商家分類規則', noMerchantRules: '目前沒有商家分類規則。', invalidLogin: '無法登入。',
     traditionalChinese: '繁體中文', english: '英文',
     invalidTransaction: '請檢查交易欄位後再試。',
+    invalidAmount: '金額最多只能輸入兩位小數，例如 34.75；不要加 $ 或逗號。', invalidCategory: '支出請選擇分類；收入不能使用支出分類。', invalidDate: '請選擇有效日期。',
     saveTransactionFailed: '無法儲存交易紀錄。', updateTransactionFailed: '無法更新交易紀錄。',
     resetSent: '如果帳戶存在，重設連結已寄出。', updateFailed: '無法更新密碼。', updateLanguageFailed: '無法更新語言，請再試一次。',
     recoveryExpired: '密碼重設工作階段已過期。', passwordUpdated: '密碼已更新。',
