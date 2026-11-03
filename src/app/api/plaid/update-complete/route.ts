@@ -16,13 +16,13 @@ export async function POST(request: Request) {
 
   try {
     const plaid = createPlaidClient()
-    await syncOwnedItem({
+    const accounts = await syncOwnedItem({
       userId: user.id,
       itemId: body.data.itemId,
       gateway: createPlaidGateway(plaid),
       repository: createSupabasePlaidRepository(createAdminClient()),
     })
-    return NextResponse.json({ itemId: body.data.itemId })
+    return NextResponse.json({ itemId: body.data.itemId, accounts })
   } catch (error) {
     if (error instanceof Error && error.message === 'Not found') {
       return NextResponse.json({ error: 'Bank connection not found' }, { status: 404 })

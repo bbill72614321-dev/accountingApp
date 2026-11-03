@@ -331,3 +331,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .print-report { border: 0; border-radius: 0; max-width: none; padding: 0; }
   .print-report th, .print-report td { border-color: #aaa; }
 }
+
+.bank-connection { flex-wrap: wrap; }
+.bank-account-access { flex-basis: 100%; min-width: 0; border-top: 1px solid var(--border); padding-top: 1rem; }
+.bank-account-access h2, .bank-access-changes h3 { font-size: 0.9rem; font-weight: 600; }
+.bank-account-access p { font-size: 0.8rem; margin-top: 0.5rem; }
+.bank-account-list { display: grid; gap: 0.5rem; margin-top: 0.75rem; }
+.bank-account-list li { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+.bank-account-list li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.bank-account-status { font-size: 0.8rem; }
+.bank-account-status.is-authorized { color: var(--success); }
+.bank-account-status.is-missing, .bank-access-warning { color: var(--danger); }
+.bank-account-status.is-unknown { color: var(--muted); }
+.bank-access-changes { display: grid; gap: 0.5rem; font-size: 0.8rem; max-width: 28rem; overflow-wrap: anywhere; }
+.bank-access-changes ul { padding-left: 1rem; list-style: disc; }
+.bank-connection .settings-row-actions { display: flex; align-items: flex-start; flex-wrap: wrap; max-width: 100%; }
+.bank-connection .bank-access-action { min-width: 0; max-width: 100%; }
+.bank-connection .settings-row-actions .muted { color: var(--muted); }
+@media (max-width: 640px) { .bank-account-access { width: 100%; } }

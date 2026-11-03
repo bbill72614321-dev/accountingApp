@@ -3,6 +3,9 @@ import type { Language } from '@/features/transactions/categories'
 import { createServerClient } from '@/lib/supabase/server'
 
 export type Dictionary = {
+  bankAccounts: string; accessLastChecked: string; accessUnknownHelp: string; noAuthorizedAccounts: string
+  accessUnknown: string; accessAuthorized: string; accessMissing: string; accessMissingHelp: string
+  accessBaselineCreated: string; accessAdded: string; accessRetained: string; accessRemoved: string; accessChanges: string; unnamedAccount: string
   accountNames: string; accountDisplayName: string; accountNameHelp: string; accountNameSaved: string; accountNameError: string
   login: string; email: string; password: string; forgotPassword: string
   sendResetLink: string; resetPassword: string; confirmPassword: string
@@ -34,6 +37,9 @@ export type Dictionary = {
 
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
+    bankAccounts: 'Accounts / cards', accessLastChecked: 'Access last checked', accessUnknownHelp: 'Access has not been verified yet. Update account access to check which accounts are shared.', noAuthorizedAccounts: 'No accounts are currently shared.',
+    accessUnknown: 'Not yet verified', accessAuthorized: 'Authorized', accessMissing: 'Not currently shared', accessMissingHelp: 'These accounts were not returned in the latest access check. Their historical transactions are kept. Update account access to review your selection.',
+    accessBaselineCreated: 'Current access has been recorded. There was no verified earlier snapshot to compare; future updates will show added, retained, and removed accounts.', accessAdded: 'Added / restored', accessRetained: 'Retained', accessRemoved: 'Access removed', accessChanges: 'Changes since the access check shown before this update', unnamedAccount: 'Previously shared account',
     accountNames: 'Account names', accountDisplayName: 'Display name', accountNameHelp: 'Up to 60 characters. Leave blank to use the bank name. Changes apply to existing and future transactions.', accountNameSaved: 'Name saved.', accountNameError: 'Unable to save. Use up to 60 characters and try again.',
     login: 'Sign in', email: 'Email', password: 'Password', forgotPassword: 'Forgot password?',
     sendResetLink: 'Send reset link', resetPassword: 'Reset password', confirmPassword: 'Confirm password',
@@ -69,6 +75,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     allTransactions: 'All transactions', unreviewedTransactions: 'Not reviewed',
   },
   'zh-TW': {
+    bankAccounts: '帳戶／卡片', accessLastChecked: '最近授權確認', accessUnknownHelp: '尚未確認目前授權清單，請使用「更新帳戶授權」確認。', noAuthorizedAccounts: '目前沒有授權分享的帳戶。',
+    accessUnknown: '尚未確認', accessAuthorized: '已授權', accessMissing: '未在目前授權清單', accessMissingHelp: '這些帳戶未出現在最近一次授權確認結果中，歷史交易仍保留。可使用「更新帳戶授權」檢查勾選。',
+    accessBaselineCreated: '已記錄目前授權清單。因為沒有先前確認紀錄，本次無法判定新增或失去授權；下次更新即可比較。', accessAdded: '新增／恢復授權', accessRetained: '保留授權', accessRemoved: '失去授權', accessChanges: '相較本次更新前顯示的授權清單', unnamedAccount: '先前授權帳戶',
     accountNames: '帳戶顯示名稱', accountDisplayName: '自訂名稱', accountNameHelp: '最多 60 字，留空則使用銀行原名。修改會套用到此帳戶的新舊交易。', accountNameSaved: '名稱已儲存。', accountNameError: '無法儲存，請確認名稱不超過 60 字後重試。',
     login: '登入', email: '電子郵件', password: '密碼', forgotPassword: '忘記密碼？',
     sendResetLink: '寄送重設連結', resetPassword: '重設密碼', confirmPassword: '確認密碼',

@@ -3,15 +3,25 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePlaidLink } from 'react-plaid-link'
+import { BankAccountChanges, type BankAccessAccount } from './bank-account-access'
+import { compareAccountAccess, type AccountAccessSnapshot, type AccountAccessChanges } from '@/features/plaid/account-access'
+import type { PlaidProviderAccount } from '@/features/plaid/sync-owned-item'
+import type { Dictionary } from '@/lib/i18n'
 
 export function UpdateBankAccessButton({
   itemId,
+  accounts,
+  snapshot,
+  dictionary,
   label,
   loadingLabel,
   successLabel,
   errorLabel,
 }: {
   itemId: string
+  accounts: BankAccessAccount[]
+  snapshot: AccountAccessSnapshot | null
+  dictionary: Dictionary
   label: string
   loadingLabel: string
   successLabel: string
@@ -23,6 +33,8 @@ export function UpdateBankAccessButton({
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const baseline = useRef<{ ids: string[] | null; accounts: BankAccessAccount[] }>({ ids: null, accounts: [] })
+  const [report, setReport] = useState<{ changes: AccountAccessChanges | null; accounts: BankAccessAccount[] } | null>(null)
 
   const { open, ready, error: linkError } = usePlaidLink({
     token,
@@ -35,10 +47,19 @@ export function UpdateBankAccessButton({
           body: JSON.stringify({ itemId }),
         })
         if (!response.ok) throw new Error('Sync failed')
+        const body: { accounts: PlaidProviderAccount[] } = await response.json()
+        const known = new Map(baseline.current.accounts.map((account) => [account.plaid_account_id, account]))
+        for (const account of body.accounts) {
+          if (!known.has(account.accountId)) known.set(account.accountId, {
+            plaid_account_id: account.accountId, name: account.name, mask: account.mask, display_name: null,
+          })
+        }
+        setReport({ changes: compareAccountAccess(baseline.current.ids, body.accounts.map((account) => account.accountId)), accounts: [...known.values()] })
         setSuccess(true)
         setMessage(successLabel)
         router.refresh()
       } catch {
+        router.refresh()
         setMessage(errorLabel)
       } finally {
         setPending(false)
@@ -61,6 +82,9 @@ export function UpdateBankAccessButton({
     setPending(true)
     setSuccess(false)
     setMessage(null)
+    setReport(null)
+    // Capture before Link opens: a webhook may refresh stored access before onSuccess runs.
+    baseline.current = { ids: snapshot?.accountIds ?? null, accounts }
     try {
       const response = await fetch('/api/plaid/update-link-token', {
         method: 'POST',
@@ -82,6 +106,7 @@ export function UpdateBankAccessButton({
 
   return <div className="bank-access-action">
     <button className="button" disabled={isPending} onClick={beginUpdate} type="button">{isPending ? loadingLabel : label}</button>
+    {report && <BankAccountChanges changes={report.changes} accounts={report.accounts} dictionary={dictionary} />}
     {displayMessage && <p className={success && !linkError ? 'bank-access-success' : 'bank-access-error'} role={success && !linkError ? 'status' : 'alert'}>{displayMessage}</p>}
   </div>
 }

@@ -98,5 +98,6 @@ export async function syncOwnedItem({
     if (!page.hasMore) await repository.updateCursor(itemId, cursor)
     hasMore = page.hasMore
   } while (hasMore)
+  return accounts
 }
 import type { PlaidItemRemovalGateway } from './disconnect-owned-item'

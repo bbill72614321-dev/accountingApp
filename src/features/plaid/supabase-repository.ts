@@ -20,18 +20,24 @@ export function createSupabasePlaidRepository(admin: SupabaseClient): PlaidSyncR
       }
     },
     async upsertAccounts(userId, itemId, accounts) {
-      if (accounts.length === 0) return
-      const { error } = await admin.from('bank_accounts').upsert(accounts.map((account) => ({
-        user_id: userId,
-        bank_item_id: itemId,
-        plaid_account_id: account.accountId,
-        name: account.name,
-        official_name: account.officialName,
-        mask: account.mask,
-        type: account.type,
-        subtype: account.subtype,
-      })), { onConflict: 'plaid_account_id' })
-      if (error) throw new Error('Unable to save linked bank accounts')
+      if (accounts.length > 0) {
+        const { error } = await admin.from('bank_accounts').upsert(accounts.map((account) => ({
+          user_id: userId,
+          bank_item_id: itemId,
+          plaid_account_id: account.accountId,
+          name: account.name,
+          official_name: account.officialName,
+          mask: account.mask,
+          type: account.type,
+          subtype: account.subtype,
+        })), { onConflict: 'plaid_account_id' })
+        if (error) throw new Error('Unable to save linked bank accounts')
+      }
+      // Keep historical accounts and transactions, even when access is withdrawn.
+      const { data, error: snapshotError } = await admin.from('bank_items').update({
+        account_access_snapshot: { accountIds: accounts.map((account) => account.accountId), checkedAt: new Date().toISOString() },
+      }).eq('id', itemId).eq('user_id', userId).select('id').maybeSingle()
+      if (snapshotError || !data) throw new Error('Unable to save account access status')
     },
     async upsertTransactions(rows) {
       if (rows.length === 0) return

@@ -1,3 +1,5 @@
+import { BankAccountAccess, type BankAccessAccount } from '@/components/bank-account-access'
+import type { AccountAccessSnapshot } from '@/features/plaid/account-access'
 import { ConnectBankButton } from '@/components/connect-bank-button'
 import { DisconnectBankForm } from '@/components/disconnect-bank-form'
 import { UpdateBankAccessButton } from '@/components/update-bank-access-button'
@@ -10,7 +12,7 @@ export default async function BanksPage() {
   const language = await getLanguage()
   const dictionary = getDictionary(language)
   const supabase = await createServerClient()
-  const { data, error } = await supabase.from('bank_items').select('id, institution_name, status, last_synced_at').eq('user_id', user.id).order('created_at', { ascending: false })
+  const { data, error } = await supabase.from('bank_items').select('id, institution_name, status, last_synced_at, account_access_snapshot, bank_accounts(plaid_account_id, name, display_name, mask)').eq('user_id', user.id).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load bank connections')
   return (
     <section className="console-page">
@@ -25,7 +27,7 @@ export default async function BanksPage() {
       </div>
       <div className="settings-list">
         {(data ?? []).map((item) => (
-          <article className="settings-row" key={item.id}>
+          <article className="settings-row bank-connection" key={item.id}>
             <div>
               <strong>{item.institution_name}</strong>
               <span>{item.status}</span>
@@ -34,6 +36,9 @@ export default async function BanksPage() {
             <div className="settings-row-actions">
               <UpdateBankAccessButton
                 itemId={item.id}
+                accounts={item.bank_accounts as BankAccessAccount[]}
+                snapshot={item.account_access_snapshot as AccountAccessSnapshot | null}
+                dictionary={dictionary}
                 label={dictionary.updateAccountAccess}
                 loadingLabel={dictionary.updatingAccountAccess}
                 successLabel={dictionary.accountAccessUpdated}
@@ -47,6 +52,7 @@ export default async function BanksPage() {
                 label={dictionary.disconnectBank}
               />
             </div>
+            <BankAccountAccess accounts={item.bank_accounts as BankAccessAccount[]} snapshot={item.account_access_snapshot as AccountAccessSnapshot | null} dictionary={dictionary} language={language} />
           </article>
         ))}
         {data?.length === 0 && <p>{dictionary.noBankConnections}</p>}

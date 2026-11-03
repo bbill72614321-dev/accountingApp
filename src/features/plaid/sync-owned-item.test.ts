@@ -127,3 +127,17 @@ it('scopes provider removals to the synced item', async () => {
 
   expect(repository.removals).toEqual([{ userId: 'user-a', itemId: 'item-a', externalIds: ['transaction-1'] }])
 })
+
+it('returns the verified account list for the authorization update result', async () => {
+  const accounts = await syncOwnedItem({ userId: 'user-a', itemId: 'item-a', gateway, repository: createRepository() })
+  expect(accounts).toEqual(await gateway.getAccounts({ accessToken: 'unused' }))
+})
+
+it('preserves previous access information when the provider account check fails', async () => {
+  const repository = createRepository()
+  const failingGateway: PlaidGateway = { ...gateway, async getAccounts() { throw new Error('Provider unavailable') } }
+  await expect(syncOwnedItem({ userId: 'user-a', itemId: 'item-a', gateway: failingGateway, repository })).rejects.toThrow('Provider unavailable')
+  expect(repository.savedAccounts).toEqual([])
+  expect(repository.transactions).toEqual([])
+  expect(repository.cursors).toEqual([])
+})
