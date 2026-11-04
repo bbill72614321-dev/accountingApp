@@ -19,7 +19,7 @@ export default async function ReimbursementsPage({ searchParams }: { searchParam
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transaction_splits').select(
     'transaction_id, split_count, personal_amount_cents, requested_at, transaction:transactions!inner(raw_description, transaction_date, amount_cents)',
-  ).eq('user_id', user.id).order('created_at', { ascending: false })
+  ).eq('user_id', user.id).is('transaction.duplicate_of', null).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load reimbursements')
 
   const rows = (data ?? []).map((row) => {

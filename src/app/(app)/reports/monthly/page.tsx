@@ -24,7 +24,7 @@ export default async function PrintableMonthlyReport({ searchParams }: { searchP
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
     'raw_description, note, transaction_date, amount_cents, source_category, category_override, pending, provider_pending, review_status, include_in_report, transaction_split:transaction_splits(personal_amount_cents)',
-  ).eq('user_id', user.id).eq('include_in_report', true)
+  ).eq('user_id', user.id).is('duplicate_of', null).eq('include_in_report', true)
     .gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
   if (error) throw new Error('Unable to load report')
 

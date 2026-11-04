@@ -32,14 +32,14 @@ export default async function TransactionsPage({
   const supabase = await createServerClient()
   let query = supabase.from('transactions').select(
     'id, created_at, source, raw_description, source_category, category_override, transaction_date, amount_cents, note, pending, provider_pending, review_status, user_reviewed_at, include_in_report, excluded_from_report, bank_account:bank_accounts(name, mask, display_name), transaction_split:transaction_splits(split_count, personal_amount_cents, requested_at)',
-  ).eq('user_id', user.id).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
+  ).eq('user_id', user.id).is('duplicate_of', null).order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
   if (month) query = query.gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
   if (category) query = query.or(effectiveCategoryFilter(category))
 
   const { data, error } = await query
   if (error) throw new Error('Unable to load transactions')
-  const { data: monthRows, error: monthError } = await supabase.from('transactions').select('transaction_date').eq('user_id', user.id)
+  const { data: monthRows, error: monthError } = await supabase.from('transactions').select('transaction_date').eq('user_id', user.id).is('duplicate_of', null)
   if (monthError) throw new Error('Unable to load available months')
   const months = availableMonths((monthRows ?? []).map((row) => row.transaction_date), homeMonth)
   const rows = (data ?? []).map((row) => ({

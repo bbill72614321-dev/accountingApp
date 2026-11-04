@@ -32,10 +32,10 @@ export default async function DashboardPage({
   const supabase = await createServerClient()
   const { data, error } = await supabase.from('transactions').select(
     'id, created_at, source, raw_description, transaction_date, amount_cents, note, source_category, category_override, pending, provider_pending, review_status, user_reviewed_at, include_in_report, excluded_from_report, bank_account:bank_accounts(name, mask, display_name), transaction_split:transaction_splits(split_count, personal_amount_cents, requested_at)',
-  ).eq('user_id', user.id).gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
+  ).eq('user_id', user.id).is('duplicate_of', null).gte('transaction_date', `${month}-01`).lt('transaction_date', `${nextMonth(month)}-01`)
     .order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
   if (error) throw new Error('Unable to load monthly summary')
-  const { data: monthRows, error: monthError } = await supabase.from('transactions').select('transaction_date').eq('user_id', user.id)
+  const { data: monthRows, error: monthError } = await supabase.from('transactions').select('transaction_date').eq('user_id', user.id).is('duplicate_of', null)
   if (monthError) throw new Error('Unable to load available months')
   const months = availableMonths((monthRows ?? []).map((row) => row.transaction_date), homeMonth)
 
